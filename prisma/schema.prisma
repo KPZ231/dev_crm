@@ -1,0 +1,495 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// IDENTITY & AUTHENTICATION (Auth.js Standard)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String? // For traditional email/repo logins
+
+  accounts    Account[]
+  sessions    Session[]
+  memberships WorkspaceMember[]
+
+  // Reverse relations for generic ownership tracking
+  auditLogs      AuditLog[] @relation("ActorAuditLogs")
+  leadsAssigned    Lead[]           @relation("LeadAssignee")
+  leadActivities   LeadActivity[]
+  clientActivities ClientActivity[]
+  tasksAssigned    Task[]           @relation("TaskAssignee")
+  tasksCreated     Task[]           @relation("TaskCreator")
+  taskComments     TaskComment[]
+  taskActivities   TaskActivity[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// MULTI-TENANCY / WORKSPACES
+// ============================================
+
+model Workspace {
+  id      String  @id @default(cuid())
+  name    String
+  slug    String  @unique
+  logoUrl String?
+
+  members   WorkspaceMember[]
+  auditLogs AuditLog[]
+  leads     Lead[]
+  clients   Client[]
+  projects  Project[]
+  invoices  Invoice[]
+  documents Document[]
+  templates DocumentTemplate[]
+  costs     Cost[]
+  tasks     Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  PM
+  DEVELOPER
+  SALES
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(DEVELOPER)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId])
+}
+
+// ============================================
+// AUDIT LOGGING & SYSTEM HISTORY
+// ============================================
+
+model AuditLog {
+  id          String  @id @default(cuid())
+  workspaceId String? // Nullable because some actions might be system-wide
+  actorId     String? // Nullable because system actions might not have a specific human actor
+  action      String // e.g., "auth.login", "workspace.created", "lead.updated"
+  entityType  String? // e.g., "User", "Workspace", "Task"
+  entityId    String?
+  metadata    Json? // Contextual data, diffs, IP address
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor     User?      @relation("ActorAuditLogs", fields: [actorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([workspaceId])
+  @@index([actorId])
+  @@index([entityType, entityId])
+}
+
+// ============================================
+// LEADS MODULE
+// ============================================
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+model Lead {
+  id              String       @id @default(cuid())
+  workspaceId     String
+  companyName     String
+  contactPerson   String
+  email           String?
+  phone           String?
+  source          String?
+  status          LeadStatus   @default(NEW)
+  potentialValue  Float?
+  notes           String?      @db.Text
+  assigneeId      String?
+  
+  workspace       Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  assignee        User?        @relation("LeadAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  activities      LeadActivity[]
+  documents       Document[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([workspaceId])
+  @@index([assigneeId])
+  @@index([status])
+}
+
+model LeadActivity {
+  id         String   @id @default(cuid())
+  leadId     String
+  actorId    String
+  action     String   // e.g., "NOTE_ADDED", "STATUS_CHANGED", "CREATED"
+  content    String?  @db.Text
+  
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  actor      User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+
+  @@index([leadId])
+  @@index([actorId])
+}
+
+// ============================================
+// CLIENTS MODULE
+// ============================================
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  LEAD
+  ARCHIVED
+}
+
+enum PaymentStatus {
+  PAID
+  UP_TO_DATE
+  OVERDUE
+  AT_RISK
+}
+
+model Client {
+  id              String       @id @default(cuid())
+  workspaceId     String
+  companyName     String
+  nip             String?      // Polish Tax ID
+  address         String?
+  website         String?
+  contactPerson   String
+  email           String?
+  phone           String?
+  industry        String?
+  status          ClientStatus @default(ACTIVE)
+  paymentStatus   PaymentStatus @default(UP_TO_DATE)
+  contractedSince DateTime?
+  notes           String?      @db.Text
+  
+  workspace       Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  activities      ClientActivity[]
+  projects        Project[]
+  invoices        Invoice[]
+  documents       Document[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([workspaceId])
+  @@index([status])
+}
+
+model ClientActivity {
+  id         String   @id @default(cuid())
+  clientId   String
+  actorId    String
+  action     String   // e.g., "NOTE_ADDED", "STATUS_CHANGED", "CREATED"
+  content    String?  @db.Text
+  
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  actor      User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+
+  @@index([clientId])
+  @@index([actorId])
+}
+
+// ============================================
+// PROJECTS, INVOICES, DOCUMENTS (Skeletons)
+// ============================================
+
+model Project {
+  id          String   @id @default(cuid())
+  workspaceId String
+  clientId    String
+  name        String
+  status      String   @default("PLANNING")
+  budget      Float?
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  documents   Document[]
+  costs       Cost[]
+  tasks       Task[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([clientId])
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  workspaceId String
+  clientId    String
+  number      String
+  amount      Float
+  status      String   @default("DRAFT")
+  dueDate     DateTime
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([clientId])
+}
+
+// ============================================
+// DOCUMENTS MODULE
+// ============================================
+
+enum DocumentStatus {
+  DRAFT
+  SENT
+  SIGNED
+  ARCHIVED
+}
+
+enum DocumentType {
+  OFFER
+  CONTRACT
+  BRIEF
+  PROTOCOL
+  INVOICE
+  SUMMARY
+}
+
+model Document {
+  id          String         @id @default(cuid())
+  workspaceId String
+  clientId    String?
+  leadId      String?
+  projectId   String?
+  templateId  String?
+  name        String
+  type        DocumentType
+  status      DocumentStatus @default(DRAFT)
+  content     Json?          // Dynamic content of the document
+  fileUrl     String?        // Link to generated PDF if available
+  
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  client      Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  lead        Lead?           @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  project     Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  template    DocumentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([clientId])
+  @@index([leadId])
+  @@index([projectId])
+}
+
+model DocumentTemplate {
+  id          String       @id @default(cuid())
+  workspaceId String
+  name        String
+  type        DocumentType
+  content     String       @db.Text // HTML or Markdown with variables
+  
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  documents   Document[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+}
+
+// ============================================
+// COSTS MODULE
+// ============================================
+
+enum CostCategory {
+  DEV
+  DESIGN
+  MARKETING
+  TOOLS
+  INFRASTRUCTURE
+  OUTSOURCING
+  OTHER
+}
+
+enum CostType {
+  FIXED
+  VARIABLE
+}
+
+model Cost {
+  id          String       @id @default(cuid())
+  workspaceId String
+  projectId   String?
+  name        String
+  category    CostCategory
+  type        CostType     @default(VARIABLE)
+  amount      Float
+  date        DateTime     @default(now())
+  isRecurring Boolean      @default(false)
+  notes       String?      @db.Text
+  
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([projectId])
+}
+
+// ============================================
+// TASKS MODULE
+// ============================================
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  REVIEW
+  BLOCKED
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  workspaceId String
+  projectId   String?
+  assigneeId  String?
+  creatorId   String
+  title       String
+  description String?      @db.Text
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  position    Float        // For fractional ordering in Kanban
+  
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  creator     User         @relation("TaskCreator", fields: [creatorId], references: [id])
+  comments    TaskComment[]
+  activities  TaskActivity[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([status])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  content   String   @db.Text
+  
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+}
+
+model TaskActivity {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  action    String   // e.g., "STATUS_CHANGE", "ASSIGNED", "CREATED"
+  fromValue String?
+  toValue   String?
+  
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+}
