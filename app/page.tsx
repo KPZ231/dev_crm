@@ -8,10 +8,12 @@ import Footer from "./components/Footer/Footer";
 import CTA from "./components/CTA/CTA";
 import MetricsOverview from "./components/Metrics/MetricsOverview";
 import VideoPlayer from "./components/VideoPlayer/VideoPlayer";
+import { DevWarning } from "./components/DevWarning";
 
 export default function Home() {
   return (
     <main className="bg-[#09090b]">
+      <DevWarning />
       <Navbar />
       <HeroSection
         title="Przyszłość Twojego zespołu w jednym miejscu."
