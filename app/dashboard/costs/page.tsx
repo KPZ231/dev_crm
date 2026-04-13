@@ -52,7 +52,7 @@ export default async function CostsPage({
         </div>
 
         <div>
-            <CostFormDialog workspaceId={workspaceId} projects={projects} onSuccess={() => {}} />
+            <CostFormDialog workspaceId={workspaceId} projects={projects} />
         </div>
       </div>
 

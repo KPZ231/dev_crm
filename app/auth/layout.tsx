@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           enableMouseInteraction={false}
         />
       </div>
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-[1] bg-[radial-gradient(circle_at_50%_40%,transparent_0%,rgba(9,9,11,0.9)_100%)]"></div>
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-1 bg-[radial-gradient(circle_at_50%_40%,transparent_0%,rgba(9,9,11,0.9)_100%)]"></div>
 
       <div className="relative z-10 w-full max-w-md p-6">
         {children}

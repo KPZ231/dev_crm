@@ -1,4 +1,4 @@
-import { Invoice, Client } from "@prisma/client";
+import { Invoice, Client, InvoiceStatus } from "@prisma/client";
 
 export type PeriodType = "monthly" | "quarterly" | "yearly";
 
@@ -26,12 +26,13 @@ export interface RevenueComparison {
   worstMonth: { label: string; value: number };
 }
 
-export type InvoiceWithClient = Invoice & {
+export type InvoiceWithClient = Omit<Invoice, "amount"> & {
+  amount: number;
   client: Pick<Client, "id" | "companyName">;
 };
 
 export interface InvoiceFilters {
-  status?: string;
+  status?: InvoiceStatus;
   clientId?: string;
   startDate?: Date;
   endDate?: Date;

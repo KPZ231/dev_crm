@@ -3,9 +3,28 @@
 import { prisma } from "@/lib/prisma";
 import { requireWorkspacePermission } from "@/core/access/workspace";
 import { TaskWithRelations, KanbanData, TaskFilters, WorkloadPoint } from "@/lib/types/task";
-import { taskSchema, commentSchema } from "@/lib/schemas/task";
+import { taskSchema, commentSchema, TaskFormValues } from "@/lib/schemas/task";
 import { TaskStatus, TaskPriority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+
+export async function getTaskFormOptions(workspaceId: string) {
+  await requireWorkspacePermission(workspaceId, "read", "task");
+
+  const [projects, members] = await Promise.all([
+    prisma.project.findMany({
+      where: { workspaceId },
+      select: { id: true, name: true }
+    }),
+    prisma.workspaceMember.findMany({
+      where: { workspaceId },
+      include: {
+        user: { select: { id: true, name: true, email: true } }
+      }
+    })
+  ]);
+
+  return { projects, members };
+}
 
 export async function getTasks(workspaceId: string, filters?: TaskFilters): Promise<TaskWithRelations[]> {
   await requireWorkspacePermission(workspaceId, "read", "task");
@@ -62,7 +81,7 @@ export async function getKanbanBoard(workspaceId: string): Promise<KanbanData> {
   return board;
 }
 
-export async function createTask(workspaceId: string, data: any) {
+export async function createTask(workspaceId: string, data: TaskFormValues) {
   const { user } = await requireWorkspacePermission(workspaceId, "create", "task");
   
   const validated = taskSchema.parse(data);
@@ -111,6 +130,29 @@ export async function moveTask(workspaceId: string, taskId: string, newStatus: T
   if (oldStatus !== newStatus) {
     await logTaskActivity(taskId, user.id, "STATUS_CHANGE", oldStatus, newStatus);
   }
+
+  revalidatePath("/dashboard/tasks");
+  return updatedTask;
+}
+
+export async function updateTask(workspaceId: string, taskId: string, data: TaskFormValues) {
+  const { user, role } = await requireWorkspacePermission(workspaceId, "update", "task");
+  
+  const validated = taskSchema.parse(data);
+
+  const existingTask = await prisma.task.findUnique({ where: { id: taskId, workspaceId } });
+  if (!existingTask) throw new Error("Task not found");
+
+  if (role === "DEVELOPER" && existingTask.assigneeId !== user.id && existingTask.creatorId !== user.id) {
+    throw new Error("You can only edit your own tasks.");
+  }
+
+  const updatedTask = await prisma.task.update({
+    where: { id: taskId },
+    data: validated
+  });
+
+  await logTaskActivity(taskId, user.id, "UPDATED", null, null);
 
   revalidatePath("/dashboard/tasks");
   return updatedTask;

@@ -10,3 +10,15 @@ export const invoiceFilterSchema = z.object({
   clientId: z.string().optional(),
   search: z.string().optional(),
 });
+
+export const invoiceSchema = z.object({
+  clientId: z.string().min(1, "Klient jest wymagany"),
+  number: z.string().min(1, "Numer faktury jest wymagany"),
+  amount: z.number().positive("Kwota musi być większa od zera"),
+  dueDate: z.date({
+    message: "Termin płatności jest wymagany",
+  }),
+  status: z.enum(["DRAFT", "SENT", "PAID", "OVERDUE", "CANCELLED"]),
+});
+
+export type InvoiceFormValues = z.infer<typeof invoiceSchema>;

@@ -23,7 +23,7 @@ export default async function KanbanPage() {
 
   return (
     <div className="p-8 lg:p-12 animate-in fade-in duration-500 overflow-hidden h-full flex flex-col">
-      <TaskHeader />
+      <TaskHeader workspaceId={membership.workspaceId} />
       <div className="flex-grow">
         <KanbanBoard initialData={initialData} workspaceId={membership.workspaceId} />
       </div>

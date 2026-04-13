@@ -14,15 +14,18 @@ import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { createCost } from "@/lib/actions/costs";
 
+import { useRouter } from "next/navigation";
+
 interface CostFormDialogProps {
   workspaceId: string;
   projects?: { id: string, name: string }[];
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export function CostFormDialog({ workspaceId, projects, onSuccess }: CostFormDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CostFormValues>({
     resolver: zodResolver(costSchema),
@@ -39,7 +42,11 @@ export function CostFormDialog({ workspaceId, projects, onSuccess }: CostFormDia
         await createCost(workspaceId, data);
         reset();
         setIsOpen(false);
-        onSuccess();
+        if (onSuccess) {
+            onSuccess();
+        } else {
+            router.refresh();
+        }
     } catch (error) {
         console.error(error);
         alert("Błąd podczas dodawania kosztu.");

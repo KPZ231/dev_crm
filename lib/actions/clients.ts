@@ -53,7 +53,11 @@ export async function getClients(workspaceId: string, filters?: ClientFilters): 
   // Calculate some derived stats for the list
   return clients.map(client => ({
     ...client,
-    totalRevenue: client.invoices.reduce((acc, inv) => acc + inv.amount, 0),
+    projects: client.projects.map(p => ({
+      ...p,
+      budget: p.budget ? Number(p.budget) : null
+    })),
+    totalRevenue: client.invoices.reduce((acc, inv) => acc + Number(inv.amount), 0),
     activeProjectsCount: client.projects.length,
     outstandingInvoicesCount: client.invoices.filter(inv => inv.status !== "PAID").length,
   }));
@@ -88,6 +92,13 @@ export async function getClientById(workspaceId: string, id: string): Promise<Cl
     client.invoices = [];
     // @ts-ignore
     client.projects = client.projects.map(p => ({ ...p, budget: null }));
+  } else {
+    // Convert decimals to numbers
+    // @ts-ignore
+    client.projects = client.projects.map(p => ({
+        ...p,
+        budget: p.budget ? Number(p.budget) : null
+    }));
   }
 
   return client as unknown as ClientWithDetails;

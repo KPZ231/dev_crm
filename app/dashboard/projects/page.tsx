@@ -1,23 +1,36 @@
-import { Briefcase, LayoutDashboard } from "lucide-react";
+import { getProjects } from "@/lib/actions/projects";
+import { ProjectsTable } from "@/components/projects/ProjectsTable";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 
-export default function ProjectsPage() {
+export const metadata = {
+  title: "Projects | CRM",
+};
+
+export default async function ProjectsPage() {
+  const result = await getProjects();
+  const projects = (result.success && result.projects) ? result.projects : [];
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] p-8 text-center animate-in fade-in zoom-in duration-500">
-      <div className="w-24 h-24 bg-[#141416] border border-[#27272a] rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
-        <Briefcase className="w-12 h-12 text-[#34d399]" />
+    <div className="flex flex-col h-full bg-[#09090b]">
+      <div className="p-6 border-b border-[#27272a] flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#fafafa] tracking-tight">Projects</h1>
+          <p className="text-[#a1a1aa] text-sm">Manage your projects, budgets and teams.</p>
+        </div>
+        
+        <Link
+          href="/dashboard/projects/new"
+          className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-semibold px-4 py-2 rounded-lg transition-all"
+        >
+          <Plus className="w-4 h-4" />
+          New Project
+        </Link>
       </div>
-      <h1 className="text-3xl font-bold text-[#fafafa] tracking-tight mb-4">Moduł Projektów (Wkrótce)</h1>
-      <p className="text-[#a1a1aa] max-w-md mx-auto leading-relaxed mb-8">
-        Ten moduł CRM odpowiada za logikę projektów (skupiającą zespoły, zadania i faktury z jednym budżetem). Implementacja trwa.
-      </p>
-      <Link 
-        href="/dashboard"
-        className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-6 py-3 rounded-xl transition-all shadow-lg"
-      >
-        <LayoutDashboard className="w-4 h-4" />
-        Wróć do Panelu
-      </Link>
+
+      <div className="grow overflow-auto p-6">
+        <ProjectsTable data={projects} />
+      </div>
     </div>
   );
 }

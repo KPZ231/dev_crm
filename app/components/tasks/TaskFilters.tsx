@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { TaskStatus, TaskPriority } from "@prisma/client";
 
 export function TaskFilters() {
     const searchParams = useSearchParams();
@@ -33,7 +32,14 @@ export function TaskFilters() {
     );
 }
 
-function FilterSelect({ label, value, options, onChange }: any) {
+interface FilterSelectProps {
+    label: string;
+    value: string;
+    options: string[];
+    onChange: (v: string) => void;
+}
+
+function FilterSelect({ label, value, options, onChange }: FilterSelectProps) {
     return (
         <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-[#52525b] uppercase tracking-widest">{label}:</span>

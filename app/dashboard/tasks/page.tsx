@@ -32,9 +32,9 @@ export default async function TasksListPage({
 
   return (
     <div className="p-8 lg:p-12 animate-in fade-in duration-500">
-      <TaskHeader />
+      <TaskHeader workspaceId={membership.workspaceId} />
       <div className="space-y-6">
-        <TaskListTable tasks={tasks} />
+        <TaskListTable tasks={tasks} workspaceId={membership.workspaceId} />
       </div>
     </div>
   );

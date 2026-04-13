@@ -83,7 +83,7 @@ export function ClientCard({ client }: ClientCardProps) {
           )}
         </div>
         
-        {client.outstandingInvoicesCount > 0 && (
+        {(client.outstandingInvoicesCount || 0) > 0 && (
           <div className="flex items-center gap-1 text-orange-400 font-medium">
             <AlertCircle className="w-3 h-3" />
             <span>Zaległe</span>

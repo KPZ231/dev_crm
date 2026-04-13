@@ -23,7 +23,7 @@ export default async function WorkloadPage() {
 
   return (
     <div className="p-8 lg:p-12 animate-in fade-in duration-500">
-      <TaskHeader />
+      <TaskHeader workspaceId={membership.workspaceId} />
       <WorkloadView workload={workload} />
     </div>
   );

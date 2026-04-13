@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireWorkspacePermission } from "@/core/access/workspace";
 import { PeriodType, RevenueDataPoint, RevenueKPIs, RevenueComparison, InvoiceWithClient, InvoiceFilters } from "@/lib/types/revenue";
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears, format, startOfQuarter, endOfQuarter } from "date-fns";
+import { revalidatePath } from "next/cache";
 
 export async function getRevenueData(workspaceId: string, period: PeriodType, year: number): Promise<RevenueDataPoint[]> {
   const { user } = await requireWorkspacePermission(workspaceId, "read", "revenue");
@@ -40,7 +41,7 @@ export async function getRevenueData(workspaceId: string, period: PeriodType, ye
       const monthInvoices = invoices.filter(inv => inv.createdAt.getMonth() === i);
       data.push({
         label: m,
-        revenue: monthInvoices.reduce((sum, inv) => sum + inv.amount, 0),
+        revenue: monthInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0),
         count: monthInvoices.length,
         date: new Date(year, i, 1)
       });
@@ -53,7 +54,7 @@ export async function getRevenueData(workspaceId: string, period: PeriodType, ye
       });
       data.push({
         label: `Q${q + 1}`,
-        revenue: qInvoices.reduce((sum, inv) => sum + inv.amount, 0),
+        revenue: qInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0),
         count: qInvoices.length,
         date: new Date(year, q * 3, 1)
       });
@@ -61,7 +62,7 @@ export async function getRevenueData(workspaceId: string, period: PeriodType, ye
   } else {
     data.push({
       label: year.toString(),
-      revenue: invoices.reduce((sum, inv) => sum + inv.amount, 0),
+      revenue: invoices.reduce((sum, inv) => sum + Number(inv.amount), 0),
       count: invoices.length,
       date: new Date(year, 0, 1)
     });
@@ -95,15 +96,15 @@ export async function getRevenueKPIs(workspaceId: string): Promise<RevenueKPIs> 
     })
   ]);
 
-  const currentMonthRevenue = thisMonthInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-  const prevMonthRevenue = prevMonthInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const currentMonthRevenue = thisMonthInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0);
+  const prevMonthRevenue = prevMonthInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0);
   const growth = prevMonthRevenue === 0 ? 100 : ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100;
 
   return {
-    mrr: currentMonthRevenue, // Mocking MRR as current month billed for now
+    mrr: currentMonthRevenue,
     currentMonthRevenue,
-    overdueInvoicesAmount: overdueInvoices.reduce((sum, inv) => sum + inv.amount, 0),
-    paidYtd: yearPaidInvoices.reduce((sum, inv) => sum + inv.amount, 0),
+    overdueInvoicesAmount: overdueInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0),
+    paidYtd: yearPaidInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0),
     growth
   };
 }
@@ -136,8 +137,8 @@ export async function getRevenueComparison(workspaceId: string, period: PeriodTy
     prisma.invoice.findMany({ where: { workspaceId, createdAt: { gte: prevStart, lte: prevEnd }, status: { not: "CANCELLED" } } })
   ]);
 
-  const currentTotal = currentInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-  const prevTotal = prevInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const currentTotal = currentInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0);
+  const prevTotal = prevInvoices.reduce((sum, inv) => sum + Number(inv.amount), 0);
 
   // For monthly best/worst, we look at the last 12 months
   const yearlyInvoices = await prisma.invoice.findMany({
@@ -151,7 +152,7 @@ export async function getRevenueComparison(workspaceId: string, period: PeriodTy
   const monthStats = Array.from({ length: 12 }).map((_, i) => {
     const revenue = yearlyInvoices
       .filter(inv => inv.createdAt.getMonth() === i)
-      .reduce((sum, inv) => sum + inv.amount, 0);
+      .reduce((sum, inv) => sum + Number(inv.amount), 0);
     return { label: format(new Date(2024, i, 1), "MMMM"), value: revenue };
   });
 
@@ -172,7 +173,7 @@ export async function getInvoiceList(workspaceId: string, filters: InvoiceFilter
 
   const { status, clientId, search } = filters;
 
-  return await prisma.invoice.findMany({
+  const invoices = await prisma.invoice.findMany({
     where: {
       workspaceId,
       ...(status && { status }),
@@ -191,4 +192,56 @@ export async function getInvoiceList(workspaceId: string, filters: InvoiceFilter
     },
     orderBy: { createdAt: "desc" }
   });
+
+  return invoices.map(inv => ({
+    ...inv,
+    amount: Number(inv.amount)
+  })) as InvoiceWithClient[];
+}
+
+export async function getInvoiceFormOptions(workspaceId: string) {
+  await requireWorkspacePermission(workspaceId, "read", "revenue");
+
+  const clients = await prisma.client.findMany({
+    where: { workspaceId },
+    select: { id: true, companyName: true }
+  });
+
+  return { clients };
+}
+
+export async function createInvoice(workspaceId: string, data: any) {
+  const { user } = await requireWorkspacePermission(workspaceId, "create", "revenue");
+  
+  // Basic validation without importing the full schema to avoid circular deps if they occur
+  // But here it should be fine.
+  const invoice = await prisma.invoice.create({
+    data: {
+      workspaceId,
+      clientId: data.clientId,
+      number: data.number,
+      amount: data.amount,
+      dueDate: new Date(data.dueDate),
+      status: data.status || "DRAFT",
+    }
+  });
+
+  // Audit log
+  await prisma.auditLog.create({
+    data: {
+      workspaceId,
+      actorId: user.id,
+      action: "invoice.created",
+      entityType: "Invoice",
+      entityId: invoice.id,
+      metadata: { number: invoice.number, amount: Number(invoice.amount) }
+    }
+  });
+
+  revalidatePath("/dashboard/revenue");
+  revalidatePath("/dashboard/costs");
+  return {
+    ...invoice,
+    amount: Number(invoice.amount)
+  };
 }

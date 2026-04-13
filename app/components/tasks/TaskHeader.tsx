@@ -10,9 +10,12 @@ import {
     Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { TaskCreateModal } from "./TaskCreateModal";
 
-export function TaskHeader() {
+export function TaskHeader({ workspaceId }: { workspaceId: string }) {
   const pathname = usePathname();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const views = [
     { id: "kanban", label: "Kanban", href: "/dashboard/tasks/kanban", icon: Kanban },
@@ -58,11 +61,19 @@ export function TaskHeader() {
                     className="bg-[#0c0c0f] border border-[#27272a] rounded-xl pl-10 pr-4 py-2 text-xs text-[#fafafa] focus:border-[#a78bfa] outline-none transition-all"
                 />
             </div>
-            <button className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-5 py-2 rounded-xl text-xs transition-all shadow-lg">
+            <button 
+                onClick={() => setIsCreateModalOpen(true)}
+                className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-5 py-2 rounded-xl text-xs transition-all shadow-lg"
+            >
                 <Plus className="w-5 h-5" /> Nowy Task
             </button>
         </div>
       </div>
+      <TaskCreateModal 
+        workspaceId={workspaceId} 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+      />
     </div>
   );
 }

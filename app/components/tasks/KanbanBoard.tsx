@@ -4,9 +4,10 @@ import { useState } from "react";
 import { KanbanData, TaskWithRelations } from "@/lib/types/task";
 import { TaskStatus } from "@prisma/client";
 import { moveTask } from "@/lib/actions/tasks";
-import { KanbanColumn } from "./KanbanColumn";
 import { motion, AnimatePresence } from "motion/react";
 import { Plus, Clock } from "lucide-react";
+import Image from "next/image";
+import { TaskCreateModal } from "./TaskCreateModal";
 
 interface KanbanBoardProps {
   initialData: KanbanData;
@@ -16,6 +17,7 @@ interface KanbanBoardProps {
 export function KanbanBoard({ initialData, workspaceId }: KanbanBoardProps) {
   const [data, setData] = useState<KanbanData>(initialData);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [createModalStatus, setCreateModalStatus] = useState<TaskStatus | null>(null);
 
   const statuses: TaskStatus[] = ["BACKLOG", "TODO", "IN_PROGRESS", "REVIEW", "BLOCKED", "DONE"];
 
@@ -76,7 +78,7 @@ export function KanbanBoard({ initialData, workspaceId }: KanbanBoardProps) {
                         {data[status].length}
                     </span>
                 </div>
-                <button className="p-1.5 text-[#52525b] hover:text-[#a78bfa] transition-colors">
+                <button onClick={() => setCreateModalStatus(status)} className="p-1.5 text-[#52525b] hover:text-[#a78bfa] transition-colors">
                     <Plus className="w-4 h-4" />
                 </button>
             </div>
@@ -88,6 +90,12 @@ export function KanbanBoard({ initialData, workspaceId }: KanbanBoardProps) {
             </div>
         </div>
       ))}
+      <TaskCreateModal 
+          workspaceId={workspaceId} 
+          isOpen={createModalStatus !== null} 
+          onClose={() => setCreateModalStatus(null)} 
+          defaultStatus={createModalStatus || "TODO"} 
+      />
     </div>
   );
 }
@@ -99,8 +107,7 @@ function KanbanCard({ task }: { task: TaskWithRelations }) {
     };
 
     return (
-        <motion.div 
-            layout
+        <div 
             draggable
             onDragStart={handleDragStart}
             className="group bg-[#0c0c0f] border border-[#27272a] rounded-xl p-4 shadow-sm hover:border-[#a78bfa]/30 transition-all cursor-grab active:cursor-grabbing hover:shadow-lg hover:shadow-[#a78bfa]/5"
@@ -110,7 +117,13 @@ function KanbanCard({ task }: { task: TaskWithRelations }) {
                     {task.priority}
                 </span>
                 {task.assignee?.image && (
-                    <img src={task.assignee.image} className="w-5 h-5 rounded-full ring-2 ring-[#0c0c0f]" alt="" />
+                    <Image 
+                        src={task.assignee.image} 
+                        width={20} 
+                        height={20} 
+                        className="w-5 h-5 rounded-full ring-2 ring-[#0c0c0f] object-cover" 
+                        alt={task.assignee.name || "Assignee"} 
+                    />
                 )}
             </div>
 
@@ -132,7 +145,7 @@ function KanbanCard({ task }: { task: TaskWithRelations }) {
                     </div>
                 )}
             </div>
-        </motion.div>
+        </div>
     );
 }
 

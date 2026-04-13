@@ -1,11 +1,7 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { taskSchema, TaskFormValues } from "@/lib/schemas/task";
 import { 
   X, 
-  Save, 
   MessageSquare, 
   History,
   Info,
@@ -14,18 +10,16 @@ import {
   User 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
-import { createTask, addTaskComment } from "@/lib/actions/tasks";
+import { useState, ReactNode } from "react";
 import { TaskWithRelations } from "@/lib/types/task";
 
 interface TaskModalProps {
   task?: TaskWithRelations;
-  workspaceId: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function TaskModal({ task, workspaceId, isOpen, onClose }: TaskModalProps) {
+export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
     const [activeTab, setActiveTab] = useState<"details" | "comments" | "activity">("details");
 
     return (
@@ -138,7 +132,14 @@ export function TaskModal({ task, workspaceId, isOpen, onClose }: TaskModalProps
     );
 }
 
-function ModalTab({ active, onClick, icon, label }: any) {
+interface ModalTabProps {
+    active: boolean;
+    onClick: () => void;
+    icon: ReactNode;
+    label: string;
+}
+
+function ModalTab({ active, onClick, icon, label }: ModalTabProps) {
     return (
         <button 
             onClick={onClick}
@@ -151,7 +152,13 @@ function ModalTab({ active, onClick, icon, label }: any) {
     );
 }
 
-function DetailItem({ icon, label, value }: any) {
+interface DetailItemProps {
+    icon: ReactNode;
+    label: string;
+    value: string | number;
+}
+
+function DetailItem({ icon, label, value }: DetailItemProps) {
     return (
         <div className="space-y-1">
             <span className="text-[10px] font-bold text-[#52525b] uppercase tracking-widest flex items-center gap-2">

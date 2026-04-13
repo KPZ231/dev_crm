@@ -1,23 +1,101 @@
-import { Settings, ShieldAlert, LayoutDashboard } from "lucide-react";
-import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { 
+  ShieldCheck, 
+  Users, 
+  Settings2, 
+  Building2,
+  ChevronRight
+} from "lucide-react";
+import { getWorkspaceMembers, getInvitations } from "@/lib/actions/admin";
+import { MemberList } from "@/app/components/admin/MemberList";
+import { InviteUserForm } from "@/app/components/admin/InviteUserForm";
+import { InvitationList } from "@/app/components/admin/InvitationList";
+import { WorkspaceSettingsButton } from "@/app/components/admin/WorkspaceSettingsButton";
 
-export default function AdminPage() {
+export const metadata = {
+  title: "Admin Panel | CRM",
+  description: "Zarządzaj zespołem i ustawieniami swojej agencji",
+};
+
+export default async function AdminPage() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  const membership = await prisma.workspaceMember.findFirst({
+    where: { userId: session.user.id },
+    include: { workspace: true }
+  });
+
+  if (!membership) redirect("/dashboard");
+
+  // Only allow OWNERS and ADMINS
+  if (membership.role !== "OWNER" && membership.role !== "ADMIN") {
+    redirect("/dashboard");
+  }
+
+  const [members, invitations] = await Promise.all([
+    getWorkspaceMembers(membership.workspaceId),
+    getInvitations(membership.workspaceId)
+  ]);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] p-8 text-center animate-in fade-in zoom-in duration-500">
-      <div className="w-24 h-24 bg-[#141416] border border-[#27272a] rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
-        <ShieldAlert className="w-12 h-12 text-[#a78bfa]" />
+    <div className="p-8 lg:p-12 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
+        <div>
+          <div className="flex items-center gap-2 text-[#a78bfa] font-bold text-[10px] uppercase tracking-[0.2em] mb-2">
+            <ShieldCheck className="w-4 h-4" />
+            Workspace Administration
+          </div>
+          <h1 className="text-4xl font-bold text-[#fafafa] tracking-tight">{membership.workspace.name}</h1>
+          <p className="text-sm text-[#52525b] mt-2 flex items-center gap-2">
+            Konfiguracja systemu i zarządzanie dostępem <ChevronRight className="w-3 h-3" /> <span className="text-[#a1a1aa]">{membership.role}</span>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="px-6 py-3 bg-[#0c0c0f] border border-[#27272a] rounded-2xl flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center font-bold text-[#fafafa]">
+                {members.length}
+             </div>
+             <div className="flex flex-col">
+                <span className="text-xs font-bold text-[#fafafa]">Aktywni członkowie</span>
+                <span className="text-[10px] text-[#52525b]">Wszyscy użytkownicy</span>
+             </div>
+          </div>
+        </div>
       </div>
-      <h1 className="text-3xl font-bold text-[#fafafa] tracking-tight mb-4">Panel Administracyjny</h1>
-      <p className="text-[#a1a1aa] max-w-md mx-auto leading-relaxed mb-8">
-        Zarządzanie uprawnieniami, użytkownikami i ustawieniami workspace zostanie dodane w nadchodzącej aktualizacji systemu.
-      </p>
-      <Link 
-        href="/dashboard"
-        className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-6 py-3 rounded-xl transition-all shadow-lg"
-      >
-        <LayoutDashboard className="w-4 h-4" />
-        Wróć do Panelu
-      </Link>
+
+      {/* Grid Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        {/* Left Column: Member List */}
+        <div className="xl:col-span-2 space-y-8">
+            <MemberList 
+              workspaceId={membership.workspaceId} 
+              members={members} 
+              currentUserId={session.user.id} 
+              currentUserRole={membership.role} 
+            />
+
+            <WorkspaceSettingsButton 
+               workspace={{ 
+                 id: membership.workspaceId, 
+                 name: membership.workspace.name, 
+                 logoUrl: membership.workspace.logoUrl 
+               }} 
+            />
+        </div>
+
+        {/* Right Column: Invite & Invitations */}
+        <div className="space-y-8">
+          <InviteUserForm workspaceId={membership.workspaceId} />
+          <InvitationList workspaceId={membership.workspaceId} invitations={invitations} />
+        </div>
+
+      </div>
     </div>
   );
 }

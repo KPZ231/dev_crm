@@ -9,12 +9,14 @@ import { RevenueComparisonRow } from "@/app/components/revenue/RevenueComparison
 import { InvoiceTable } from "@/app/components/revenue/InvoiceTable";
 import { PeriodType } from "@/lib/types/revenue";
 import { RevenuePeriodToggle } from "./RevenuePeriodToggle";
+import { NewInvoiceButton } from "@/app/components/revenue/NewInvoiceButton";
 import { 
   BarChart3, 
   Layers, 
   Calendar as CalendarIcon,
   Plus
 } from "lucide-react";
+import { InvoiceStatus } from "@prisma/client";
 
 export const metadata = {
   title: "Revenue Analytics | CRM",
@@ -46,7 +48,7 @@ export default async function RevenuePage({
     getRevenueData(workspaceId, period, year),
     getRevenueKPIs(workspaceId),
     getRevenueComparison(workspaceId, period),
-    getInvoiceList(workspaceId, { status: searchParams.status })
+    getInvoiceList(workspaceId, { status: searchParams.status as InvoiceStatus })
   ]);
 
   return (
@@ -96,9 +98,7 @@ export default async function RevenuePage({
                     <BarChart3 className="w-5 h-5 text-[#a78bfa]" />
                     <h2 className="text-xl font-bold text-[#fafafa]">Recent Billings</h2>
                 </div>
-                <button className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-5 py-2 rounded-xl text-xs transition-all">
-                    <Plus className="w-4 h-4" /> Nowa Faktura
-                </button>
+                <NewInvoiceButton workspaceId={workspaceId} />
             </div>
             <InvoiceTable invoices={invoices} />
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const [error, setError] = useState<string | undefined>("");
@@ -116,5 +116,17 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+        <div className="w-full bg-[#0c0c0f] border border-[#27272a] rounded-2xl p-8 flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-8 h-8 animate-spin text-[#a78bfa]" />
+        </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

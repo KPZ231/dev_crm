@@ -125,7 +125,7 @@ export function LeadForm({ initialData, users, onSubmit }: LeadFormProps) {
         <div className="space-y-2">
           <label className="text-sm font-medium text-[#a1a1aa]">Wartość potencjalna (PLN)</label>
           <input
-            {...register("potentialValue")}
+            {...register("potentialValue", { valueAsNumber: true })}
             type="number"
             step="0.01"
             className="w-full bg-[#0c0c0f] border border-[#27272a] rounded-lg px-4 py-2 text-[#fafafa] focus:ring-2 focus:ring-[#a78bfa] transition-all"

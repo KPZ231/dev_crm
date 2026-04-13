@@ -4,13 +4,13 @@ import { z } from "zod";
 export const leadSchema = z.object({
   companyName: z.string().min(1, "Nazwa firmy jest wymagana"),
   contactPerson: z.string().min(1, "Osoba kontaktowa jest wymagana"),
-  email: z.string().email("Niepoprawny format email").optional().or(z.literal("")),
-  phone: z.string().optional().or(z.literal("")),
-  source: z.string().optional().or(z.literal("")),
-  status: z.nativeEnum(LeadStatus).default(LeadStatus.NEW),
-  potentialValue: z.coerce.number().min(0).optional().nullable(),
-  notes: z.string().optional().or(z.literal("")),
-  assigneeId: z.string().optional().or(z.literal("")).nullable(),
+  email: z.string().email("Niepoprawny format email").nullable(),
+  phone: z.string().nullable(),
+  source: z.string().nullable(),
+  status: z.nativeEnum(LeadStatus),
+  potentialValue: z.number().nullable(),
+  notes: z.string().nullable(),
+  assigneeId: z.string().nullable(),
 });
 
 export const createLeadSchema = leadSchema;

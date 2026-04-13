@@ -11,10 +11,10 @@ import { revalidatePath } from "next/cache";
 export async function getCosts(workspaceId: string, filters?: any): Promise<CostWithProject[]> {
   const { role, user } = await requireWorkspacePermission(workspaceId, "read", "cost");
 
-  return await prisma.cost.findMany({
+  const costs = await prisma.cost.findMany({
     where: {
       workspaceId,
-      ...(role === "DEVELOPER" ? { projectId: { not: null } } : {}), // Basic filtering for devs
+      ...(role === "DEVELOPER" ? { projectId: { not: null } } : {}),
       ...(filters?.projectId && { projectId: filters.projectId }),
       ...(filters?.category && { category: filters.category })
     },
@@ -23,6 +23,11 @@ export async function getCosts(workspaceId: string, filters?: any): Promise<Cost
     },
     orderBy: { date: "desc" }
   });
+
+  return costs.map(c => ({
+    ...c,
+    amount: Number(c.amount)
+  }));
 }
 
 export async function createCost(workspaceId: string, data: any) {
@@ -38,37 +43,55 @@ export async function createCost(workspaceId: string, data: any) {
   });
 
   revalidatePath("/dashboard/costs");
-  return cost;
+  return {
+    ...cost,
+    amount: Number(cost.amount)
+  };
 }
 
 export async function getCostsKPIs(workspaceId: string): Promise<CostsKPIs> {
   await requireWorkspacePermission(workspaceId, "read", "cost");
 
   const now = new Date();
-  const [fixedCosts, variableCosts, totalRevenue] = await Promise.all([
+  const [fixedMonthlyResult, yearCostsResult, yearRevenueResult] = await Promise.all([
+    // Current month fixed costs
     prisma.cost.aggregate({
-      where: { workspaceId, type: "FIXED", date: { gte: startOfMonth(now), lte: endOfMonth(now) } },
+      where: { 
+        workspaceId, 
+        type: "FIXED", 
+        date: { gte: startOfMonth(now), lte: endOfMonth(now) } 
+      },
       _sum: { amount: true }
     }),
+    // All costs this year
     prisma.cost.aggregate({
-      where: { workspaceId, type: "VARIABLE", date: { gte: startOfYear(now), lte: endOfYear(now) } },
+      where: { 
+        workspaceId, 
+        date: { gte: startOfYear(now), lte: endOfYear(now) } 
+      },
       _sum: { amount: true }
     }),
+    // All revenue this year (issued invoices)
     prisma.invoice.aggregate({
-      where: { workspaceId, status: "PAID", createdAt: { gte: startOfYear(now) } },
+      where: { 
+        workspaceId, 
+        status: { not: "CANCELLED" }, 
+        createdAt: { gte: startOfYear(now), lte: endOfYear(now) } 
+      },
       _sum: { amount: true }
     })
   ]);
 
-  const totalCostsVal = (fixedCosts._sum.amount || 0) + (variableCosts._sum.amount || 0);
-  const revenueVal = totalRevenue._sum.amount || 0;
+  const monthlyFixed = Number(fixedMonthlyResult._sum.amount || 0);
+  const yearTotalCosts = Number(yearCostsResult._sum.amount || 0);
+  const yearTotalRevenue = Number(yearRevenueResult._sum.amount || 0);
 
   return {
-    fixedMonthlyCosts: fixedCosts._sum.amount || 0,
-    variableYtd: variableCosts._sum.amount || 0,
-    totalCosts: totalCostsVal,
-    totalRevenue: revenueVal,
-    grossMargin: revenueVal === 0 ? 0 : ((revenueVal - totalCostsVal) / revenueVal) * 100
+    fixedMonthlyCosts: monthlyFixed,
+    variableYtd: yearTotalCosts - monthlyFixed,
+    totalCosts: yearTotalCosts,
+    totalRevenue: yearTotalRevenue,
+    grossMargin: yearTotalRevenue === 0 ? 0 : ((yearTotalRevenue - yearTotalCosts) / yearTotalRevenue) * 100
   };
 }
 
@@ -82,11 +105,11 @@ export async function getProjectCostSummary(workspaceId: string, projectId: stri
 
   if (!project) throw new Error("Project not found");
 
-  const totalCosts = project.costs.reduce((sum, c) => sum + c.amount, 0);
+  const totalCosts = project.costs.reduce((sum, c) => sum + Number(c.amount), 0);
   
   const categories: CostCategory[] = ["DEV", "DESIGN", "MARKETING", "TOOLS", "INFRASTRUCTURE", "OUTSOURCING", "OTHER"];
   const breakdown: CategoryBreakdown[] = categories.map(cat => {
-    const amount = project.costs.filter(c => c.category === cat).reduce((sum, c) => sum + c.amount, 0);
+    const amount = project.costs.filter(c => c.category === cat).reduce((sum, c) => sum + Number(c.amount), 0);
     return {
       category: cat,
       amount,
@@ -94,13 +117,15 @@ export async function getProjectCostSummary(workspaceId: string, projectId: stri
     };
   });
 
+  const budgetNum = Number(project.budget || 0);
+
   return {
     projectId,
     projectName: project.name,
-    totalBudget: project.budget || 0,
+    totalBudget: budgetNum,
     totalCosts,
-    margin: (project.budget || 0) - totalCosts,
-    progress: project.budget ? (totalCosts / project.budget) * 100 : 0,
+    margin: budgetNum - totalCosts,
+    progress: budgetNum > 0 ? (totalCosts / budgetNum) * 100 : 0,
     breakdown
   };
 }
@@ -109,11 +134,11 @@ export async function getCostBreakdown(workspaceId: string): Promise<CategoryBre
     await requireWorkspacePermission(workspaceId, "read", "cost");
     
     const costs = await prisma.cost.findMany({ where: { workspaceId } });
-    const total = costs.reduce((sum, c) => sum + c.amount, 0);
+    const total = costs.reduce((sum, c) => sum + Number(c.amount), 0);
 
     const categories: CostCategory[] = ["DEV", "DESIGN", "MARKETING", "TOOLS", "INFRASTRUCTURE", "OUTSOURCING", "OTHER"];
     return categories.map(cat => {
-        const amount = costs.filter(c => c.category === cat).reduce((sum, c) => sum + c.amount, 0);
+        const amount = costs.filter(c => c.category === cat).reduce((sum, c) => sum + Number(c.amount), 0);
         return {
             category: cat,
             amount,

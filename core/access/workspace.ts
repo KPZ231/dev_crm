@@ -12,7 +12,7 @@ export async function requireAuth() {
   if (!session || !session.user || !session.user.id) {
     throw new Error("Unauthorized");
   }
-  return session.user;
+  return session.user as { id: string; email?: string | null; name?: string | null; image?: string | null };
 }
 
 /**
