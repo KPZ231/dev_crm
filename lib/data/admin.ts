@@ -1,6 +1,32 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { unstable_cache } from "next/cache";
+import { WorkspaceRole } from "@prisma/client";
+
+/**
+ * Shared Interfaces to ensure UI compatibility and strict typing.
+ */
+export interface WorkspaceMemberCached {
+  id: string;
+  role: WorkspaceRole;
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  };
+}
+
+export interface InvitationCached {
+  id: string;
+  email: string;
+  role: WorkspaceRole;
+  createdAt: Date;
+  invitedBy: {
+    name: string | null;
+    email: string;
+  };
+}
 
 /**
  * Fetches workspace context and ensures user has admin/owner role.
@@ -22,13 +48,13 @@ async function getAdminContext() {
 /**
  * Optimized fetcher for workspace members with role-based visibility.
  */
-export async function getCachedWorkspaceMembers(workspaceId: string) {
+export async function getCachedWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberCached[]> {
   const context = await getAdminContext();
   if (!context) return [];
 
   return unstable_cache(
     async () => {
-      return prisma.workspaceMember.findMany({
+      const members = await prisma.workspaceMember.findMany({
         where: { workspaceId },
         select: {
           id: true,
@@ -44,6 +70,7 @@ export async function getCachedWorkspaceMembers(workspaceId: string) {
         },
         orderBy: { createdAt: "asc" },
       });
+      return members as unknown as WorkspaceMemberCached[];
     },
     [`workspace-members-${workspaceId}`],
     {
@@ -56,13 +83,13 @@ export async function getCachedWorkspaceMembers(workspaceId: string) {
 /**
  * Optimized fetcher for workspace invitations.
  */
-export async function getCachedInvitations(workspaceId: string) {
+export async function getCachedInvitations(workspaceId: string): Promise<InvitationCached[]> {
   const context = await getAdminContext();
   if (!context) return [];
 
   return unstable_cache(
     async () => {
-      return prisma.invitation.findMany({
+      const invitations = await prisma.invitation.findMany({
         where: { 
           workspaceId,
           acceptedAt: null,
@@ -79,6 +106,7 @@ export async function getCachedInvitations(workspaceId: string) {
         },
         orderBy: { createdAt: "desc" },
       });
+      return invitations as unknown as InvitationCached[];
     },
     [`workspace-invitations-${workspaceId}`],
     {
@@ -87,3 +115,4 @@ export async function getCachedInvitations(workspaceId: string) {
     }
   )();
 }
+
