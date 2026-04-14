@@ -47,7 +47,7 @@ export default async function EditProjectPage({ params }: { params: { id: string
       </div>
 
       <div className="p-6 max-w-4xl">
-        <ProjectForm initialData={projectResult.project as any} clients={clients} />
+        <ProjectForm initialData={projectResult.project} clients={clients} />
       </div>
     </div>
   );

@@ -65,12 +65,13 @@ export async function getCachedClients(params: {
             select: {
               projects: true,
               invoices: true,
+              documents: true,
             },
           },
           // Only fetch sensitive data if role allows
           invoices: hasFinancialAccess ? {
             select: { amount: true, status: true },
-          } : false,
+          } : { take: 0 }, // Using take: 0 instead of false for better Prisma type consistency
           projects: {
             where: { status: { notIn: ["COMPLETED", "CANCELLED"] } },
             select: { id: true },
@@ -82,13 +83,14 @@ export async function getCachedClients(params: {
 
       return clients.map(client => ({
         ...client,
-        totalRevenue: hasFinancialAccess ? client.invoices.reduce((acc, inv) => acc + Number(inv.amount), 0) : null,
+        totalRevenue: hasFinancialAccess ? (client.invoices as any[]).reduce((acc, inv) => acc + Number(inv.amount), 0) : null,
         activeProjectsCount: client.projects.length,
-        outstandingInvoicesCount: hasFinancialAccess ? client.invoices.filter(inv => inv.status !== "PAID").length : null,
-        invoices: undefined, // Hide raw data
+        outstandingInvoicesCount: hasFinancialAccess ? (client.invoices as any[]).filter(inv => inv.status !== "PAID").length : null,
+        invoices: undefined,
         projects: undefined,
-      }));
+      })) as any; // Escape hatch for complex composite types in cached results
     },
+
     [cacheKey],
     {
       revalidate: 60,
@@ -161,7 +163,7 @@ export async function getCachedClientById(id: string) {
             },
             orderBy: { createdAt: "desc" },
             take: 5
-          } : false,
+          } : { take: 0 },
         },
         cacheStrategy: { ttl: 30, swr: 30 }
       });
@@ -170,12 +172,17 @@ export async function getCachedClientById(id: string) {
 
       return {
           ...client,
-          // Budget conversion for decimals
-          projects: client.projects.map(p => ({
+          // Systematic mapping for complex types
+          projects: (client.projects as any[]).map(p => ({
               ...p,
               budget: p.budget ? Number(p.budget) : null
-          }))
-      };
+          })),
+          invoices: hasFinancialAccess ? (client.invoices as any[]).map(inv => ({
+              ...inv,
+              amount: Number(inv.amount)
+          })) : []
+      } as any;
+
     },
     [`client-detail-${id}-${role}`],
     {

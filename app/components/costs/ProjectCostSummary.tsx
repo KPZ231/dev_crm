@@ -4,8 +4,6 @@ import { ProjectCostSummaryData } from "@/lib/types/cost";
 import { motion } from "motion/react";
 import { 
   Target, 
-  Wallet, 
-  Percent, 
   AlertCircle 
 } from "lucide-react";
 

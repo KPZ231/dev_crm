@@ -3,17 +3,11 @@
 import { ClientWithStats } from "@/lib/types/client";
 import { 
   Building2, 
-  MoreHorizontal, 
   ArrowUpRight, 
   Mail, 
-  Phone,
-  Globe,
   Briefcase,
-  Receipt,
-  FileText
 } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
 
 interface ClientTableProps {
   clients: ClientWithStats[];

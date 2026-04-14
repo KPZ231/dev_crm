@@ -41,9 +41,10 @@ export function InvoiceCreateModal({ workspaceId, isOpen, onClose }: InvoiceCrea
       toast.success("Faktura została pomyślnie utworzona");
       reset();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.message || "Wystąpił błąd podczas tworzenia faktury");
+      const message = error instanceof Error ? error.message : "Wystąpił błąd podczas tworzenia faktury";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { NavItem } from "@/lib/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 

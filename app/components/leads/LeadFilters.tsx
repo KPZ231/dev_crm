@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { LeadStatus } from "@prisma/client";
-import { Search, Filter, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 interface LeadFiltersProps {
   initialSearch?: string;
@@ -14,7 +14,7 @@ export function LeadFilters({ initialSearch, initialStatus }: LeadFiltersProps) 
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   function handleSearch(term: string) {
     const params = new URLSearchParams(searchParams.toString());

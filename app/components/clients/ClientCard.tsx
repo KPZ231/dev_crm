@@ -2,14 +2,12 @@
 
 import { ClientWithStats } from "@/lib/types/client";
 import { 
-  Building2, 
   ArrowUpRight, 
   Mail, 
   Phone,
   Briefcase,
   TrendingUp,
-  AlertCircle,
-  Activity
+  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 

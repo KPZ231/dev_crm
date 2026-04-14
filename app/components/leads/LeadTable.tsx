@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LeadStatus } from "@prisma/client";
 import { LeadWithAssignee } from "@/lib/types/lead";
 import { MoreHorizontal, User as UserIcon } from "lucide-react";
+import Image from "next/image";
 
 interface LeadTableProps {
   leads: LeadWithAssignee[];
@@ -64,7 +65,7 @@ export function LeadTable({ leads, showFinancials }: LeadTableProps) {
                 {lead.assignee ? (
                   <div className="flex items-center gap-2">
                     {lead.assignee.image ? (
-                      <img src={lead.assignee.image} className="w-6 h-6 rounded-full" alt="" />
+                      <Image src={lead.assignee.image} width={24} height={24} className="w-6 h-6 rounded-full" alt="" />
                     ) : (
                       <div className="w-6 h-6 rounded-full bg-[#1a1a1c] flex items-center justify-center">
                         <UserIcon className="w-4 h-4 text-[#a1a1aa]" />

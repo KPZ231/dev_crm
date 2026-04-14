@@ -13,6 +13,7 @@ import {
 } from "../schemas/lead";
 import { canManageLeads, canDeleteLeads, canViewFinancials } from "../permissions";
 import { WorkspaceRole } from "@prisma/client";
+import { LeadWithDetails } from "../types/lead";
 
 // Utility to get current workspace and role context
 async function getWorkspaceContext(required: true): Promise<{ userId: string; workspaceId: string; role: WorkspaceRole }>;
@@ -65,7 +66,7 @@ export async function getLeads(params: { search?: string, status?: string }) {
   return leads;
 }
 
-export async function getLeadById(id: string) {
+export async function getLeadById(id: string): Promise<LeadWithDetails | null> {
   const { workspaceId, role } = await getWorkspaceContext(true);
 
   const lead = await prisma.lead.findUnique({
@@ -90,7 +91,7 @@ export async function getLeadById(id: string) {
     lead.potentialValue = null;
   }
 
-  return lead;
+  return lead as LeadWithDetails;
 }
 
 export async function createLead(data: CreateLeadInput) {
@@ -137,9 +138,9 @@ export async function createLead(data: CreateLeadInput) {
     }
   });
 
-  revalidateTag("leads");
-  revalidateTag("stats");
-  revalidateTag(`workspace-${workspaceId}`);
+  revalidateTag("leads", "max");
+  revalidateTag("stats", "max");
+  revalidateTag(`workspace-${workspaceId}`, "max");
   revalidatePath("/dashboard/leads");
   return lead;
 }
@@ -175,9 +176,9 @@ export async function updateLead(id: string, data: UpdateLeadInput) {
     }
   });
 
-  revalidateTag("leads");
-  revalidateTag(`lead-${id}`);
-  revalidateTag(`workspace-${workspaceId}`);
+  revalidateTag("leads", "max");
+  revalidateTag(`lead-${id}`, "max");
+  revalidateTag(`workspace-${workspaceId}`, "max");
   revalidatePath(`/dashboard/leads`);
   revalidatePath(`/dashboard/leads/${id}`);
   return lead;
@@ -207,10 +208,10 @@ export async function deleteLead(id: string) {
     }
   });
 
-  revalidateTag("leads");
-  revalidateTag("stats");
-  revalidateTag(`workspace-${workspaceId}`);
-  revalidateTag(`lead-${id}`);
+  revalidateTag("leads", "max");
+  revalidateTag("stats", "max");
+  revalidateTag(`workspace-${workspaceId}`, "max");
+  revalidateTag(`lead-${id}`, "max");
   revalidatePath("/dashboard/leads");
 }
 
@@ -231,7 +232,7 @@ export async function addLeadActivity(leadId: string, data: AddLeadActivityInput
     }
   });
 
-  revalidateTag(`lead-${leadId}`);
+  revalidateTag(`lead-${leadId}`, "max");
   revalidatePath(`/dashboard/leads/${leadId}`);
   return activity;
 }

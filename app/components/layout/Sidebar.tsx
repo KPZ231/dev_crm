@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getSidebarItems, NavItem } from "@/lib/navigation";
+import { getSidebarItems } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { LogOut, ChevronRight } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { WorkspaceRole } from "@prisma/client";

@@ -3,12 +3,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { costSchema, CostFormValues } from "@/lib/schemas/cost";
-import { CostCategory, CostType } from "@prisma/client";
 import { 
   X, 
   Save, 
-  Plus,
-  AlertCircle
+  Plus
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";

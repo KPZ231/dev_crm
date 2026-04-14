@@ -23,7 +23,7 @@ export default function InvitePage() {
           router.push("/dashboard");
         }, 2000);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setStatus("error");
       setErrorMsg(error instanceof Error ? error.message : "Wystąpił nieoczekiwany błąd.");
@@ -32,7 +32,10 @@ export default function InvitePage() {
 
   useEffect(() => {
     if (token) {
-      handleAccept();
+      const timer = setTimeout(() => {
+        handleAccept();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [token, handleAccept]);
 

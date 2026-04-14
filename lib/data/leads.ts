@@ -90,9 +90,45 @@ export async function getCachedLeads(params: {
 }
 
 /**
+ * Detailed structure for a lead in detail views.
+ */
+export interface CachedLead {
+  id: string;
+  companyName: string;
+  contactPerson: string;
+  email: string;
+  phone: string | null;
+  source: string | null;
+  status: LeadStatus;
+  potentialValue: number | null;
+  notes: string | null;
+  assigneeId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  assignee: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  } | null;
+  activities: {
+    id: string;
+    action: string;
+    content: string | null;
+    createdAt: Date;
+    actor: {
+      id: string;
+      name: string | null;
+      email: string;
+      image: string | null;
+    };
+  }[];
+}
+
+/**
  * Fetches a single lead by ID with caching.
  */
-export async function getCachedLeadById(id: string) {
+export async function getCachedLeadById(id: string): Promise<CachedLead | null> {
   const context = await getAuthContext();
   if (!context) return null;
 
@@ -111,7 +147,7 @@ export async function getCachedLeadById(id: string) {
           phone: true,
           source: true,
           status: true,
-          potentialValue: showFinancials,
+          potentialValue: true,
           notes: true,
           assigneeId: true,
           assignee: {
@@ -135,7 +171,12 @@ export async function getCachedLeadById(id: string) {
         cacheStrategy: { ttl: 30, swr: 30 }
       });
 
-      return lead;
+      if (!lead) return null;
+
+      return {
+        ...lead,
+        potentialValue: showFinancials ? (lead.potentialValue ? Number(lead.potentialValue) : null) : null,
+      } as unknown as CachedLead;
     },
     [`lead-detail-${id}-${role}`],
     {
@@ -144,6 +185,7 @@ export async function getCachedLeadById(id: string) {
     }
   )();
 }
+
 
 /**
  * Fetches users in the current workspace for assignments.

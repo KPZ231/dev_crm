@@ -1,7 +1,7 @@
 "use client";
 
 import { LeadWithDetails } from "@/lib/types/lead";
-import { User, MessageSquare, History, Edit, PlusCircle } from "lucide-react";
+import { MessageSquare, History, Edit, PlusCircle } from "lucide-react";
 
 interface LeadActivityTimelineProps {
   activities: LeadWithDetails["activities"];

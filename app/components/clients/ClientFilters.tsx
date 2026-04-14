@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ClientStatus, PaymentStatus } from "@prisma/client";
-import { Search, Filter, X, LayoutGrid, List } from "lucide-react";
+import { Search, X, LayoutGrid, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ClientFiltersProps {
@@ -24,7 +24,7 @@ export function ClientFilters({
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   function updateQuery(name: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString());

@@ -1,88 +1,166 @@
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\clients\ClientsListPageClient.tsx
-  11:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\DevWarning.tsx
+  19:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\clients\[id]\ClientDetailClient.tsx
-  179:35  warning  'icon' is defined but never used          @typescript-eslint/no-unused-vars
-  179:54  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  190:44  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  199:40  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\clients\[id]\page.tsx
-    9:3   warning  'Mail' is defined but never used          @typescript-eslint/no-unused-vars
-   10:3   warning  'Phone' is defined but never used         @typescript-eslint/no-unused-vars
-   11:3   warning  'MapPin' is defined but never used        @typescript-eslint/no-unused-vars
-   17:3   warning  'MoreVertical' is defined but never used  @typescript-eslint/no-unused-vars
-  137:68  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\clients\page.tsx
-  43:82  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
-  52:36  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
-  53:50  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
-  55:42  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\DevWarning.tsx:19:7
+  17 |       return () => clearTimeout(timer);
+  18 |     } else {
+> 19 |       setShowBar(true);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  20 |     }
+  21 |   }, []);
+  22 |  react-hooks/set-state-in-effect
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\dashboard\page.tsx
-  120:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  189:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\clients\ClientCard.tsx
+   5:3  warning  'Building2' is defined but never used  @typescript-eslint/no-unused-vars
+  12:3  warning  'Activity' is defined but never used   @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\documents\[id]\DocumentDetailClient.tsx
-   18:10  warning  'prisma' is defined but never used        @typescript-eslint/no-unused-vars
-   33:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
-   38:36  warning  'content' is defined but never used       @typescript-eslint/no-unused-vars
-   45:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
-   55:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
-  109:57  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\clients\ClientFilters.tsx
+   6:18  warning  'Filter' is defined but never used              @typescript-eslint/no-unused-vars
+  27:10  warning  'isPending' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\documents\new\DocumentNewWizard.tsx
-   17:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-   18:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-   19:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  117:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  183:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\clients\ClientForm.tsx
+  7:25  warning  'X' is defined but never used         @typescript-eslint/no-unused-vars
+  8:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\documents\page.tsx
-  10:5  warning  'Filter' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\clients\ClientTable.tsx
+   6:3   warning  'MoreHorizontal' is defined but never used  @typescript-eslint/no-unused-vars
+   9:3   warning  'Phone' is defined but never used           @typescript-eslint/no-unused-vars
+  10:3   warning  'Globe' is defined but never used           @typescript-eslint/no-unused-vars
+  12:3   warning  'Receipt' is defined but never used         @typescript-eslint/no-unused-vars
+  13:3   warning  'FileText' is defined but never used        @typescript-eslint/no-unused-vars
+  16:10  warning  'format' is defined but never used          @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\leads\[id]\page.tsx
-    4:10  warning  'LeadForm' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
-   21:16  warning  'users' is assigned a value but never used                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
-   33:9   warning  'canEdit' is assigned a value but never used                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
-   35:18  warning  'handleUpdate' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
-   35:37  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
-   99:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-  150:18  error    'History' is not defined                                                                                                                                                                                                                                                                 react/jsx-no-undef
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\clients\ClientTabs.tsx
+  3:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\leads\new\page.tsx
-  17:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\clients\ClientTimeline.tsx
+  10:3   warning  'UserPlus' is defined but never used  @typescript-eslint/no-unused-vars
+  37:34  warning  'index' is defined but never used     @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\leads\page.tsx
-  59:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\costs\CostFormDialog.tsx
+   6:10  warning  'CostCategory' is defined but never used  @typescript-eslint/no-unused-vars
+   6:24  warning  'CostType' is defined but never used      @typescript-eslint/no-unused-vars
+  11:3   warning  'AlertCircle' is defined but never used   @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\revenue\page.tsx
-  16:3   warning  'Download' is defined but never used                             @typescript-eslint/no-unused-vars
-  63:91  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\costs\CostsTable.tsx
+  9:3  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\(dashboard)\tasks\page.tsx
-   6:10  warning  'TaskFilters' is defined but never used   @typescript-eslint/no-unused-vars
-  28:36  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  29:40  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\costs\ProjectCostSummary.tsx
+  7:3  warning  'Wallet' is defined but never used   @typescript-eslint/no-unused-vars
+  8:3  warning  'Percent' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\api\search\route.ts
-  35:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  56:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\documents\DocumentEditor.tsx
+   3:20  warning  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+   5:34  warning  'List' is defined but never used          @typescript-eslint/no-unused-vars
+   5:40  warning  'Bold' is defined but never used          @typescript-eslint/no-unused-vars
+   5:46  warning  'Italic' is defined but never used        @typescript-eslint/no-unused-vars
+   6:10  warning  'motion' is defined but never used        @typescript-eslint/no-unused-vars
+  66:55  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\Features\Features.tsx
-  189:60  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\documents\DocumentsTable.tsx
+  6:3  warning  'MoreVertical' is defined but never used  @typescript-eslint/no-unused-vars
+  7:3  warning  'ExternalLink' is defined but never used  @typescript-eslint/no-unused-vars
+  9:3  warning  'Download' is defined but never used      @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\Footer\Footer.tsx
-  101:51  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\layout\AppShell.tsx
+  6:10  warning  'NavItem' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\Metrics\MetricsOverview.tsx
-  28:23  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
-  40:9   warning  'linePoints' is assigned a value but never used  @typescript-eslint/no-unused-vars
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\layout\Sidebar.tsx
+  5:27  warning  'NavItem' is defined but never used       @typescript-eslint/no-unused-vars
+  7:18  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\Pricing\Pricing.tsx
-  133:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\leads\LeadActivityTimeline.tsx
+  4:10  warning  'User' is defined but never used  @typescript-eslint/no-unused-vars
 
-Ôťľ 49 problems (30 errors, 19 warnings)
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\leads\LeadFilters.tsx
+   6:18  warning  'Filter' is defined but never used              @typescript-eslint/no-unused-vars
+  17:10  warning  'isPending' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\leads\LeadForm.tsx
+  14:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\leads\LeadTable.tsx
+  67:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\revenue\InvoiceCreateModal.tsx
+  44:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\revenue\InvoiceTable.tsx
+   6:3  warning  'ExternalLink' is defined but never used  @typescript-eslint/no-unused-vars
+   9:3  warning  'Filter' is defined but never used        @typescript-eslint/no-unused-vars
+  11:3  warning  'MoreVertical' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\revenue\RevenueComparison.tsx
+  9:3  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\search\SearchModal.tsx
+  17:18  warning  'AnimatePresence' is defined but never used                                                                     @typescript-eslint/no-unused-vars
+  40:6   warning  React Hook useEffect has a missing dependency: 'startSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  58:6   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  75:19  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\tasks\KanbanBoard.tsx
+   7:10  warning  'motion' is defined but never used              @typescript-eslint/no-unused-vars
+   7:18  warning  'AnimatePresence' is defined but never used     @typescript-eslint/no-unused-vars
+  19:10  warning  'isSyncing' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\tasks\TaskListTable.tsx
+  10:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\components\tasks\WorkloadView.tsx
+  30:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\dashboard\admin\page.tsx
+  6:3  warning  'Users' is defined but never used      @typescript-eslint/no-unused-vars
+  7:3  warning  'Settings2' is defined but never used  @typescript-eslint/no-unused-vars
+  8:3  warning  'Building2' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\dashboard\loading.tsx
+  1:10  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+  1:22  warning  'Users' is defined but never used       @typescript-eslint/no-unused-vars
+  1:39  warning  'BarChart3' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\dashboard\profile\page.tsx
+  1:10  warning  'Settings' is defined but never used   @typescript-eslint/no-unused-vars
+  1:26  warning  'Briefcase' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\dashboard\projects\[id]\edit\page.tsx
+  50:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\dashboard\projects\[id]\page.tsx
+    4:82  warning  'Clock' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  103:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  113:51  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  131:53  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  176:47  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  180:24  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\invite\[token]\page.tsx
+  26:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  35:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\kacperduda\Documents\KPZsProductions\dev_crm\app\invite\[token]\page.tsx:35:7
+  33 |   useEffect(() => {
+  34 |     if (token) {
+> 35 |       handleAccept();
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  36 |     }
+  37 |   }, [token, handleAccept]);
+  38 |  react-hooks/set-state-in-effect
+
+✖ 71 problems (13 errors, 58 warnings)
 

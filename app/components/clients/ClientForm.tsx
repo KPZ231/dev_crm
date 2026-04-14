@@ -4,8 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { clientSchema, ClientFormValues } from "@/lib/schemas/client";
 import { ClientStatus, PaymentStatus } from "@prisma/client";
-import { Loader2, Save, X } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Save } from "lucide-react";
 
 interface ClientFormProps {
   initialData?: Partial<ClientFormValues>;

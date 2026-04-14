@@ -6,7 +6,6 @@ import { pl } from "date-fns/locale";
 import { 
   CreditCard, 
   Trash2, 
-  ChevronRight, 
   Repeat,
   ExternalLink
 } from "lucide-react";

@@ -14,15 +14,16 @@ import {
   ProjectRole
 } from "@prisma/client";
 
-export type ProjectWithRelations = Project & {
+export type ProjectWithRelations = Omit<Project, "budget"> & {
+  budget: number | null;
   client: Client | null;
   creator: User;
   members: (ProjectMember & { user: User })[];
   milestones: ProjectMilestone[];
-  tasks?: Task[];
+  tasks?: (Task & { assignee: User | null })[];
   documents?: Document[];
   costs?: Cost[];
-  invoices?: (ProjectInvoice & { invoice: Invoice })[];
+  invoices?: (Omit<ProjectInvoice, "amount"> & { amount: number; invoice: Invoice })[];
   _count?: {
     tasks: number;
     documents: number;
@@ -30,7 +31,8 @@ export type ProjectWithRelations = Project & {
   };
 };
 
-export type ProjectSummary = Project & {
+export type ProjectSummary = Omit<Project, "budget"> & {
+  budget: number | null;
   client: Pick<Client, "id" | "companyName"> | null;
   members: (ProjectMember & { user: Pick<User, "id" | "name" | "image"> })[];
   _count: {

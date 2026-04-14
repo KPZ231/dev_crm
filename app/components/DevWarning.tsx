@@ -16,7 +16,11 @@ export function DevWarning() {
       }, 800);
       return () => clearTimeout(timer);
     } else {
-      setShowBar(true);
+      // Use a timeout to avoid synchronous setState inside an effect warning
+      const timer = setTimeout(() => {
+        setShowBar(true);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, []);
 

@@ -238,9 +238,9 @@ export async function createInvoice(workspaceId: string, data: any) {
     }
   });
 
-  revalidateTag("revenue");
-  revalidateTag("stats");
-  revalidateTag(`workspace-${workspaceId}`);
+  revalidateTag("revenue", "max");
+  revalidateTag("stats", "max");
+  revalidateTag(`workspace-${workspaceId}`, "max");
   revalidatePath("/dashboard/revenue");
   revalidatePath("/dashboard/costs");
   return {

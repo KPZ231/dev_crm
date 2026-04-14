@@ -51,16 +51,14 @@ export async function getClients(workspaceId: string, filters?: ClientFilters): 
   });
 
   // Calculate some derived stats for the list
-  return clients.map(client => ({
+  const results = clients.map((client: any) => ({
     ...client,
-    projects: client.projects.map(p => ({
-      ...p,
-      budget: p.budget ? Number(p.budget) : null
-    })),
-    totalRevenue: client.invoices.reduce((acc, inv) => acc + Number(inv.amount), 0),
+    totalRevenue: client.invoices.reduce((acc: number, inv: any) => acc + Number(inv.amount), 0),
     activeProjectsCount: client.projects.length,
-    outstandingInvoicesCount: client.invoices.filter(inv => inv.status !== "PAID").length,
+    outstandingInvoicesCount: client.invoices.filter((inv: any) => inv.status !== "PAID").length,
   }));
+
+  return results as unknown as ClientWithStats[];
 }
 
 export async function getClientById(workspaceId: string, id: string): Promise<ClientWithDetails | null> {
@@ -129,8 +127,8 @@ export async function createClient(workspaceId: string, data: any) {
     return newClient;
   });
 
-  revalidateTag("clients");
-  revalidateTag(`workspace-${workspaceId}`);
+  revalidateTag("clients", "max");
+  revalidateTag(`workspace-${workspaceId}`, "max");
   revalidatePath("/dashboard/clients");
   return client;
 }
@@ -158,9 +156,9 @@ export async function updateClient(workspaceId: string, id: string, data: any) {
     return updatedClient;
   });
 
-  revalidateTag("clients");
-  revalidateTag(`client-${id}`);
-  revalidateTag(`workspace-${workspaceId}`);
+  revalidateTag("clients", "max");
+  revalidateTag(`client-${id}`, "max");
+  revalidateTag(`workspace-${workspaceId}`, "max");
   revalidatePath(`/dashboard/clients/${id}`);
   revalidatePath("/dashboard/clients");
   return client;

@@ -1,8 +1,9 @@
 import { getProjectById } from "@/lib/actions/projects";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Pencil, Users, Calendar, DollarSign, Target, CheckCircle2, Clock } from "lucide-react";
+import { ChevronLeft, Pencil, Users, Calendar, DollarSign, Target, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
+import Image from "next/image";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const result = await getProjectById(params.id);
@@ -100,7 +101,7 @@ export default async function ProjectDetailsPage({ params }: { params: { id: str
                   <span className="text-xs uppercase font-semibold">Tasks Completed</span>
                 </div>
                 <p className="text-[#fafafa] font-medium text-lg">
-                  {project.tasks?.filter((t: any) => t.status === "DONE").length || 0}
+                  {project.tasks?.filter((t) => t.status === "DONE").length || 0}
                   <span className="text-sm text-[#a1a1aa] ml-1">/ {project.tasks?.length || 0}</span>
                 </p>
               </div>
@@ -110,7 +111,7 @@ export default async function ProjectDetailsPage({ params }: { params: { id: str
                   <span className="text-xs uppercase font-semibold">Milestones</span>
                 </div>
                 <p className="text-[#fafafa] font-medium text-lg">
-                  {project.milestones?.filter((m: any) => m.completed).length || 0}
+                  {project.milestones?.filter((m) => m.completed).length || 0}
                   <span className="text-sm text-[#a1a1aa] ml-1">/ {project.milestones?.length || 0}</span>
                 </p>
               </div>
@@ -128,7 +129,7 @@ export default async function ProjectDetailsPage({ params }: { params: { id: str
             
             {project.milestones && project.milestones.length > 0 ? (
               <div className="relative border-l border-[#27272a] ml-3 pl-4 space-y-6">
-                {project.milestones.map((milestone: any) => (
+                {project.milestones.map((milestone) => (
                   <div key={milestone.id} className="relative">
                     <div className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border-2 border-[#0c0c0f] bg-[#27272a]">
                       {milestone.completed && <div className="absolute inset-0 bg-[#34d399] rounded-full" />}
@@ -173,11 +174,11 @@ export default async function ProjectDetailsPage({ params }: { params: { id: str
              </div>
              
              <div className="space-y-3">
-               {project.members?.map((member: any) => (
+               {project.members?.map((member) => (
                  <div key={member.id} className="flex items-center gap-3">
                    <div className="h-8 w-8 rounded-full bg-[#18181b] border border-[#27272a] flex items-center justify-center text-[#fafafa] text-xs overflow-hidden">
                      {member.user?.image ? (
-                       <img src={member.user.image} alt={member.user.name || ""} className="w-full h-full object-cover" />
+                       <Image src={member.user.image} alt={member.user.name || ""} width={32} height={32} className="w-full h-full object-cover" />
                      ) : (
                        <span>{getInitials(member.user?.name)}</span>
                      )}

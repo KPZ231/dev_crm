@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 interface LeadFormProps {
   initialData?: Partial<LeadFormValues> & { id?: string };
   users: Pick<User, "id" | "name" | "email">[];
-  onSubmit: (data: LeadFormValues) => Promise<any>;
+  onSubmit: (data: LeadFormValues) => Promise<void>;
 }
 
 export function LeadForm({ initialData, users, onSubmit }: LeadFormProps) {
@@ -43,8 +43,9 @@ export function LeadForm({ initialData, users, onSubmit }: LeadFormProps) {
     setError(null);
     try {
       await onSubmit(data);
-    } catch (err: any) {
-      setError(err.message || "Wystąpił błąd podczas zapisywania leada.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Wystąpił błąd podczas zapisywania leada.";
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }

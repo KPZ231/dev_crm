@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DocumentPreview } from "./DocumentPreview";
-import { Save, Eye, Edit3, Type, List, Bold, Italic } from "lucide-react";
-import { motion } from "motion/react";
+import { Save, Eye, Edit3, Type } from "lucide-react";
 
 interface DocumentEditorProps {
   initialContent: string;
@@ -63,7 +62,14 @@ export function DocumentEditor({ initialContent, onSave, isLoading }: DocumentEd
   );
 }
 
-function ViewToggle({ active, onClick, icon, label }: any) {
+interface ViewToggleProps {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}
+
+function ViewToggle({ active, onClick, icon, label }: ViewToggleProps) {
     return (
         <button 
             onClick={onClick}
@@ -76,3 +82,4 @@ function ViewToggle({ active, onClick, icon, label }: any) {
         </button>
     );
 }
+

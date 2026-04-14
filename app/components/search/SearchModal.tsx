@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SearchResult, SearchJobResponse } from "@/lib/types/search";
+import { cn } from "@/lib/utils";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -42,7 +43,9 @@ export function SearchModal({ onClose }: SearchModalProps) {
   // Polling logic
   useEffect(() => {
     if (jobId && !pollInterval.current) {
-        pollInterval.current = setInterval(checkStatus, 3000);
+        pollInterval.current = setInterval(() => {
+            checkStatus();
+        }, 3000);
     }
 
     if (status?.status === 'completed' || status?.status === 'failed') {
@@ -72,8 +75,8 @@ export function SearchModal({ onClose }: SearchModalProps) {
       if (!response.ok) throw new Error(await response.text());
       const data = await response.json();
       setJobId(data.jobId);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd");
       setIsLoading(false);
     }
   };
@@ -218,6 +221,3 @@ function ResultItem({ result, index }: { result: SearchResult; index: number }) 
     );
 }
 
-function cn(...classes: string[]) {
-    return classes.filter(Boolean).join(" ");
-}

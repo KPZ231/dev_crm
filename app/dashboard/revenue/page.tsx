@@ -77,7 +77,7 @@ export default async function RevenuePage({
       </div>
 
       {/* KPI Section */}
-      <RevenueKpiRow kpis={kpis} />
+      {kpis && <RevenueKpiRow kpis={kpis} />}
 
       {/* Main Analytics Grid */}
       <div className="grid grid-cols-1 gap-12">

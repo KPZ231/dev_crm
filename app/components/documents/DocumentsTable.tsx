@@ -3,10 +3,7 @@
 import { DocumentWithRelations } from "@/lib/types/document";
 import { 
   FileText, 
-  MoreVertical, 
-  ExternalLink, 
   Eye, 
-  Download,
   Clock,
   CheckCircle2,
   Send,

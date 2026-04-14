@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { createProjectSchema, updateProjectSchema, addProjectMemberSchema, createMilestoneSchema, updateMilestoneSchema } from "@/lib/schemas/project";
 import { z } from "zod";
-
 import { WorkspaceRole } from "@prisma/client";
+import { ProjectWithRelations } from "@/lib/types/project";
 
 async function getSession() {
   const session = await auth();
@@ -74,7 +74,7 @@ export async function getProjects() {
   }
 }
 
-export async function getProjectById(id: string) {
+export async function getProjectById(id: string): Promise<{ success: boolean; project?: ProjectWithRelations; error?: string }> {
   try {
     const { workspaceId } = await getSession();
     const prismaProject = await prisma.project.findFirst({
@@ -98,7 +98,8 @@ export async function getProjectById(id: string) {
           ...inv,
           amount: Number(inv.amount)
       }))
-    };
+    } as unknown as ProjectWithRelations;
+
     return { success: true, project };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -131,9 +132,9 @@ export async function createProject(data: z.infer<typeof createProjectSchema>) {
         budget: prismaProject.budget ? Number(prismaProject.budget) : null
     };
 
-    revalidateTag("projects");
-    revalidateTag("stats");
-    revalidateTag(`workspace-${workspaceId}`);
+    revalidateTag("projects", "max");
+    revalidateTag("stats", "max");
+    revalidateTag(`workspace-${workspaceId}`, "max");
     revalidatePath("/dashboard/projects");
     return { success: true, project };
   } catch (error: any) {
@@ -156,9 +157,9 @@ export async function updateProject(id: string, data: Partial<z.infer<typeof cre
         budget: prismaProject.budget ? Number(prismaProject.budget) : null
     };
 
-    revalidateTag("projects");
-    revalidateTag(`project-${id}`);
-    revalidateTag(`workspace-${workspaceId}`);
+    revalidateTag("projects", "max");
+    revalidateTag(`project-${id}`, "max");
+    revalidateTag(`workspace-${workspaceId}`, "max");
     revalidatePath(`/dashboard/projects/${id}`);
     revalidatePath("/dashboard/projects");
     return { success: true, project };
@@ -176,10 +177,10 @@ export async function deleteProject(id: string) {
       where: { id, workspaceId }
     });
 
-    revalidateTag("projects");
-    revalidateTag("stats");
-    revalidateTag(`workspace-${workspaceId}`);
-    revalidateTag(`project-${id}`);
+    revalidateTag("projects", "max");
+    revalidateTag("stats", "max");
+    revalidateTag(`workspace-${workspaceId}`, "max");
+    revalidateTag(`project-${id}`, "max");
     revalidatePath("/dashboard/projects");
     return { success: true };
   } catch (error: any) {
@@ -197,7 +198,7 @@ export async function createMilestone(data: z.infer<typeof createMilestoneSchema
       data: validatedData
     });
     
-    revalidateTag(`project-${validatedData.projectId}`);
+    revalidateTag(`project-${validatedData.projectId}`, "max");
     revalidatePath(`/dashboard/projects/${validatedData.projectId}/timeline`);
     return { success: true };
   } catch (error: any) {
@@ -223,7 +224,7 @@ export async function updateMilestone(id: string, data: z.infer<typeof updateMil
       data: updateData
     });
 
-    revalidateTag(`project-${milestone.projectId}`);
+    revalidateTag(`project-${milestone.projectId}`, "max");
     revalidatePath(`/dashboard/projects/${milestone.projectId}/timeline`);
     return { success: true };
   } catch (error: any) {
@@ -242,7 +243,7 @@ export async function addProjectMember(data: z.infer<typeof addProjectMemberSche
       data: validatedData
     });
     
-    revalidateTag(`project-${validatedData.projectId}`);
+    revalidateTag(`project-${validatedData.projectId}`, "max");
     revalidatePath(`/dashboard/projects/${validatedData.projectId}/team`);
     return { success: true };
   } catch (error: any) {
@@ -259,7 +260,7 @@ export async function removeProjectMember(projectId: string, userId: string) {
       where: { projectId_userId: { projectId, userId } }
     });
     
-    revalidateTag(`project-${projectId}`);
+    revalidateTag(`project-${projectId}`, "max");
     revalidatePath(`/dashboard/projects/${projectId}/team`);
     return { success: true };
   } catch (error: any) {

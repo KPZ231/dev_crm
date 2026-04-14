@@ -7,7 +7,6 @@ import {
   PlusCircle, 
   FileEdit, 
   MessageSquare, 
-  UserPlus, 
   ArrowRightLeft,
   Calendar,
   Clock 
@@ -34,7 +33,7 @@ export function ClientTimeline({ activities }: ClientTimelineProps) {
 
   return (
     <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[#27272a] before:via-[#27272a] before:to-transparent">
-      {activities.map((activity, index) => (
+      {activities.map((activity) => (
         <div key={activity.id} className="relative flex items-start gap-6 group">
           {/* Icon / Marker */}
           <div className="sticky top-0 mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0c0c0f] border border-[#27272a] shadow-xl group-hover:border-[#a78bfa]/50 transition-colors z-10">
