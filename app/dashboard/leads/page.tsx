@@ -1,13 +1,13 @@
 import { Metadata } from "next";
-import { getLeads } from "@/lib/actions/leads";
+import { getCachedLeads } from "@/lib/data/leads";
 import { LeadTable } from "@/app/components/leads/LeadTable";
 import { LeadFilters } from "@/app/components/leads/LeadFilters";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { canManageLeads, canViewFinancials } from "@/lib/permissions";
 import { LeadWithAssignee } from "@/lib/types/lead";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Leads | CRM",
@@ -17,20 +17,29 @@ export const metadata: Metadata = {
 export default async function LeadsPage({
   searchParams,
 }: {
-  searchParams: { search?: string; status?: string };
+  searchParams: { search?: string; status?: string; page?: string };
 }) {
   const session = await auth();
   if (!session?.user?.id) return null;
 
+  // We still need the role for UI permissions (canCreate, showFinancials)
+  // But data fetching is now handled by the optimized data layer
   const member = await prisma.workspaceMember.findFirst({
-    where: { userId: session.user.id }
+    where: { userId: session.user.id },
+    select: { role: true }
   });
 
   if (!member) return null;
 
-  const leads = await getLeads(searchParams);
+  const { leads } = await getCachedLeads({
+    search: searchParams.search,
+    status: searchParams.status,
+    page: searchParams.page ? parseInt(searchParams.page) : 1
+  });
+  
   const showFinancials = canViewFinancials(member.role);
   const canCreate = canManageLeads(member.role);
+
 
   return (
     <div className="flex flex-col h-full bg-[#09090b]">

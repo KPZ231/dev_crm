@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { canViewRevenue } from "@/lib/permissions";
-import { getRevenueData, getRevenueKPIs, getRevenueComparison, getInvoiceList } from "@/lib/actions/revenue";
+import { getInvoiceList, getRevenueComparison } from "@/lib/actions/revenue";
+import { getCachedRevenueData, getCachedRevenueKPIs } from "@/lib/data/revenue";
 import { RevenueKpiRow } from "@/app/components/revenue/RevenueKpiRow";
 import { RevenueChart } from "@/app/components/revenue/RevenueChart";
 import { RevenueComparisonRow } from "@/app/components/revenue/RevenueComparison";
@@ -14,7 +15,6 @@ import {
   BarChart3, 
   Layers, 
   Calendar as CalendarIcon,
-  Plus
 } from "lucide-react";
 import { InvoiceStatus } from "@prisma/client";
 
@@ -32,7 +32,8 @@ export default async function RevenuePage({
   if (!session?.user?.id) return null;
 
   const membership = await prisma.workspaceMember.findFirst({
-    where: { userId: session.user.id }
+    where: { userId: session.user.id },
+    select: { workspaceId: true, role: true }
   });
 
   if (!membership || !canViewRevenue(membership.role)) {
@@ -43,13 +44,14 @@ export default async function RevenuePage({
   const year = searchParams.year ? parseInt(searchParams.year) : new Date().getFullYear();
   const workspaceId = membership.workspaceId;
 
-  // Parallel data fetching for performance
+  // Optimized data fetching using the new data layer and parallel execution
   const [data, kpis, comparison, invoices] = await Promise.all([
-    getRevenueData(workspaceId, period, year),
-    getRevenueKPIs(workspaceId),
+    getCachedRevenueData(year),
+    getCachedRevenueKPIs(),
     getRevenueComparison(workspaceId, period),
     getInvoiceList(workspaceId, { status: searchParams.status as InvoiceStatus })
   ]);
+
 
   return (
     <div className="p-8 lg:p-12 bg-[#09090b] min-h-screen space-y-12 animate-in fade-in duration-700">

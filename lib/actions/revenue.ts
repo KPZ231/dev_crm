@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireWorkspacePermission } from "@/core/access/workspace";
 import { PeriodType, RevenueDataPoint, RevenueKPIs, RevenueComparison, InvoiceWithClient, InvoiceFilters } from "@/lib/types/revenue";
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears, format, startOfQuarter, endOfQuarter } from "date-fns";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function getRevenueData(workspaceId: string, period: PeriodType, year: number): Promise<RevenueDataPoint[]> {
   const { user } = await requireWorkspacePermission(workspaceId, "read", "revenue");
@@ -238,6 +238,9 @@ export async function createInvoice(workspaceId: string, data: any) {
     }
   });
 
+  revalidateTag("revenue");
+  revalidateTag("stats");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath("/dashboard/revenue");
   revalidatePath("/dashboard/costs");
   return {

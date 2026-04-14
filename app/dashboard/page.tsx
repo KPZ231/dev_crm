@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { getDashboardStats } from "@/lib/actions/leads";
+import { getCachedDashboardStats, getCachedWorkspaces } from "@/lib/data/dashboard";
 import Link from "next/link";
 import { 
   Users, 
@@ -16,18 +15,14 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  // Fetch stats and workspaces
+  // Fetch stats and workspaces using the optimized data layer
   const [stats, workspaces] = await Promise.all([
-    getDashboardStats(),
-    prisma.workspace.findMany({
-      where: {
-        members: { some: { userId: session.user.id } }
-      },
-      include: { _count: { select: { members: true } } }
-    })
+    getCachedDashboardStats(),
+    getCachedWorkspaces()
   ]);
 
-  const activeWorkspace = workspaces[0]; // Assume first for dashboard landing
+  const activeWorkspace = workspaces?.[0]; // Assume first for dashboard landing
+
 
   if (!stats || !activeWorkspace) {
     return (

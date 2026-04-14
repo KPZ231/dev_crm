@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { createProjectSchema, updateProjectSchema, addProjectMemberSchema, createMilestoneSchema, updateMilestoneSchema } from "@/lib/schemas/project";
@@ -131,7 +131,10 @@ export async function createProject(data: z.infer<typeof createProjectSchema>) {
         budget: prismaProject.budget ? Number(prismaProject.budget) : null
     };
 
-    revalidatePath("/projects");
+    revalidateTag("projects");
+    revalidateTag("stats");
+    revalidateTag(`workspace-${workspaceId}`);
+    revalidatePath("/dashboard/projects");
     return { success: true, project };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -153,8 +156,11 @@ export async function updateProject(id: string, data: Partial<z.infer<typeof cre
         budget: prismaProject.budget ? Number(prismaProject.budget) : null
     };
 
-    revalidatePath(`/projects/${id}`);
-    revalidatePath("/projects");
+    revalidateTag("projects");
+    revalidateTag(`project-${id}`);
+    revalidateTag(`workspace-${workspaceId}`);
+    revalidatePath(`/dashboard/projects/${id}`);
+    revalidatePath("/dashboard/projects");
     return { success: true, project };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -170,7 +176,11 @@ export async function deleteProject(id: string) {
       where: { id, workspaceId }
     });
 
-    revalidatePath("/projects");
+    revalidateTag("projects");
+    revalidateTag("stats");
+    revalidateTag(`workspace-${workspaceId}`);
+    revalidateTag(`project-${id}`);
+    revalidatePath("/dashboard/projects");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -187,7 +197,8 @@ export async function createMilestone(data: z.infer<typeof createMilestoneSchema
       data: validatedData
     });
     
-    revalidatePath(`/projects/${validatedData.projectId}/timeline`);
+    revalidateTag(`project-${validatedData.projectId}`);
+    revalidatePath(`/dashboard/projects/${validatedData.projectId}/timeline`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -212,7 +223,8 @@ export async function updateMilestone(id: string, data: z.infer<typeof updateMil
       data: updateData
     });
 
-    revalidatePath(`/projects/${milestone.projectId}/timeline`);
+    revalidateTag(`project-${milestone.projectId}`);
+    revalidatePath(`/dashboard/projects/${milestone.projectId}/timeline`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -230,7 +242,8 @@ export async function addProjectMember(data: z.infer<typeof addProjectMemberSche
       data: validatedData
     });
     
-    revalidatePath(`/projects/${validatedData.projectId}/team`);
+    revalidateTag(`project-${validatedData.projectId}`);
+    revalidatePath(`/dashboard/projects/${validatedData.projectId}/team`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -246,7 +259,8 @@ export async function removeProjectMember(projectId: string, userId: string) {
       where: { projectId_userId: { projectId, userId } }
     });
     
-    revalidatePath(`/projects/${projectId}/team`);
+    revalidateTag(`project-${projectId}`);
+    revalidatePath(`/dashboard/projects/${projectId}/team`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

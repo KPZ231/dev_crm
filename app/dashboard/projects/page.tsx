@@ -1,4 +1,4 @@
-import { getProjects } from "@/lib/actions/projects";
+import { getCachedProjects } from "@/lib/data/projects";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -8,8 +8,8 @@ export const metadata = {
 };
 
 export default async function ProjectsPage() {
-  const result = await getProjects();
-  const projects = (result.success && result.projects) ? result.projects : [];
+  const projects = await getCachedProjects();
+
 
   return (
     <div className="flex flex-col h-full bg-[#09090b]">

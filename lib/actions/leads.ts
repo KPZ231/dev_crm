@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { 
   createLeadSchema, 
   updateLeadSchema, 
@@ -137,6 +137,9 @@ export async function createLead(data: CreateLeadInput) {
     }
   });
 
+  revalidateTag("leads");
+  revalidateTag("stats");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath("/dashboard/leads");
   return lead;
 }
@@ -172,8 +175,11 @@ export async function updateLead(id: string, data: UpdateLeadInput) {
     }
   });
 
-  revalidatePath(`/leads`);
-  revalidatePath(`/leads/${id}`);
+  revalidateTag("leads");
+  revalidateTag(`lead-${id}`);
+  revalidateTag(`workspace-${workspaceId}`);
+  revalidatePath(`/dashboard/leads`);
+  revalidatePath(`/dashboard/leads/${id}`);
   return lead;
 }
 
@@ -201,6 +207,10 @@ export async function deleteLead(id: string) {
     }
   });
 
+  revalidateTag("leads");
+  revalidateTag("stats");
+  revalidateTag(`workspace-${workspaceId}`);
+  revalidateTag(`lead-${id}`);
   revalidatePath("/dashboard/leads");
 }
 
@@ -221,7 +231,8 @@ export async function addLeadActivity(leadId: string, data: AddLeadActivityInput
     }
   });
 
-  revalidatePath(`/leads/${leadId}`);
+  revalidateTag(`lead-${leadId}`);
+  revalidatePath(`/dashboard/leads/${leadId}`);
   return activity;
 }
 

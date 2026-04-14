@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { clientSchema, clientUpdateSchema } from "@/lib/schemas/client";
 import { ClientFilters, ClientWithDetails, ClientWithStats } from "@/lib/types/client";
 import { requireWorkspacePermission } from "@/core/access/workspace";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function getClients(workspaceId: string, filters?: ClientFilters): Promise<ClientWithStats[]> {
   await requireWorkspacePermission(workspaceId, "read", "client");
@@ -129,6 +129,8 @@ export async function createClient(workspaceId: string, data: any) {
     return newClient;
   });
 
+  revalidateTag("clients");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath("/dashboard/clients");
   return client;
 }
@@ -156,7 +158,10 @@ export async function updateClient(workspaceId: string, id: string, data: any) {
     return updatedClient;
   });
 
-  revalidatePath(`/clients/${id}`);
+  revalidateTag("clients");
+  revalidateTag(`client-${id}`);
+  revalidateTag(`workspace-${workspaceId}`);
+  revalidatePath(`/dashboard/clients/${id}`);
   revalidatePath("/dashboard/clients");
   return client;
 }

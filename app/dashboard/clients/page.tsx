@@ -1,12 +1,11 @@
 import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getClients } from "@/lib/actions/clients";
+import { getCachedClients } from "@/lib/data/clients";
 import { canManageClients } from "@/lib/permissions";
 import { ClientsListPageClient } from "./ClientsListPageClient";
 import Link from "next/link";
 import { Plus, Building2 } from "lucide-react";
-import { ClientStatus, PaymentStatus } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Klienci | CRM",
@@ -27,10 +26,14 @@ export default async function ClientsPage({
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  // Get active workspace for the user
+  // Get active workspace membership for permissions and workspace metadata
   const membership = await prisma.workspaceMember.findFirst({
     where: { userId: session.user.id },
-    include: { workspace: true }
+    select: { 
+      workspaceId: true, 
+      role: true,
+      workspace: { select: { name: true } }
+    }
   });
 
   if (!membership) {
@@ -47,16 +50,14 @@ export default async function ClientsPage({
     );
   }
 
-  const workspaceId = membership.workspaceId;
-  const clients = await getClients(workspaceId, {
+  const clients = await getCachedClients({
     search: searchParams.search,
-    status: searchParams.status as ClientStatus,
-    paymentStatus: searchParams.paymentStatus as PaymentStatus,
-    sortBy: searchParams.sortBy,
-    sortOrder: searchParams.sortOrder as "asc" | "desc",
+    status: searchParams.status,
+    paymentStatus: searchParams.paymentStatus,
   });
 
   const canCreate = canManageClients(membership.role);
+
 
   return (
     <div className="flex flex-col h-full bg-[#09090b] min-h-screen">
