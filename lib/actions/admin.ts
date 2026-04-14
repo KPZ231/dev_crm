@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireWorkspacePermission, requireAuth } from "@/core/access/workspace";
 import { inviteSchema, memberUpdateSchema } from "@/lib/schemas/admin";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import crypto from "crypto";
 import { WorkspaceRole } from "@prisma/client";
 
@@ -85,6 +85,9 @@ export async function inviteUser(workspaceId: string, data: { email: string; rol
   // In a real app, send email here.
   // For now, we'll just return success.
   
+  revalidateTag("members");
+  revalidateTag("invitations");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath(`/dashboard/admin`);
   return { success: true, token }; // Returning token for easy testing/manual sharing
 }
@@ -114,6 +117,8 @@ export async function cancelInvitation(workspaceId: string, invitationId: string
     where: { id: invitationId, workspaceId },
   });
 
+  revalidateTag("invitations");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath(`/dashboard/admin`);
   return { success: true };
 }
@@ -151,6 +156,8 @@ export async function updateMemberRole(workspaceId: string, memberId: string, da
     data: { role: validated.role },
   });
 
+  revalidateTag("members");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath(`/dashboard/admin`);
   return { success: true };
 }
@@ -180,6 +187,8 @@ export async function removeMember(workspaceId: string, memberId: string) {
     where: { id: memberId },
   });
 
+  revalidateTag("members");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath(`/dashboard/admin`);
   return { success: true };
 }
@@ -249,6 +258,10 @@ export async function acceptInvitation(token: string) {
       });
   });
 
+  revalidateTag("members");
+  revalidateTag("invitations");
+  revalidateTag(`workspace-${invitation.workspaceId}`);
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/admin");
   return { success: true, workspaceId: invitation.workspaceId };
 }

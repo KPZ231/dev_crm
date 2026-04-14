@@ -8,7 +8,7 @@ import {
   Building2,
   ChevronRight
 } from "lucide-react";
-import { getWorkspaceMembers, getInvitations } from "@/lib/actions/admin";
+import { getCachedWorkspaceMembers, getCachedInvitations } from "@/lib/data/admin";
 import { MemberList } from "@/app/components/admin/MemberList";
 import { InviteUserForm } from "@/app/components/admin/InviteUserForm";
 import { InvitationList } from "@/app/components/admin/InvitationList";
@@ -25,7 +25,11 @@ export default async function AdminPage() {
 
   const membership = await prisma.workspaceMember.findFirst({
     where: { userId: session.user.id },
-    include: { workspace: true }
+    select: { 
+      role: true, 
+      workspaceId: true,
+      workspace: { select: { name: true, logoUrl: true } }
+    }
   });
 
   if (!membership) redirect("/dashboard");
@@ -36,9 +40,10 @@ export default async function AdminPage() {
   }
 
   const [members, invitations] = await Promise.all([
-    getWorkspaceMembers(membership.workspaceId),
-    getInvitations(membership.workspaceId)
+    getCachedWorkspaceMembers(membership.workspaceId),
+    getCachedInvitations(membership.workspaceId)
   ]);
+
 
   return (
     <div className="p-8 lg:p-12 animate-in fade-in duration-500">
