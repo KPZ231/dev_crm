@@ -44,9 +44,9 @@ export async function getCachedClients(params: {
           workspaceId,
           ...(params.search && {
             OR: [
-              { companyName: { contains: params.search, mode: "insensitive" } },
-              { contactPerson: { contains: params.search, mode: "insensitive" } },
-              { email: { contains: params.search, mode: "insensitive" } },
+              { companyName: { contains: params.search, mode: "insensitive" as const } },
+              { contactPerson: { contains: params.search, mode: "insensitive" as const } },
+              { email: { contains: params.search, mode: "insensitive" as const } },
             ],
           }),
           ...(params.status && { status: params.status as ClientStatus }),
@@ -81,14 +81,14 @@ export async function getCachedClients(params: {
         cacheStrategy: { ttl: 60, swr: 60 }
       });
 
-      return clients.map(client => ({
+      return (clients as any[]).map(client => ({
         ...client,
-        totalRevenue: hasFinancialAccess ? (client.invoices as any[]).reduce((acc, inv) => acc + Number(inv.amount), 0) : null,
+        totalRevenue: hasFinancialAccess ? client.invoices.reduce((acc: number, inv: any) => acc + Number(inv.amount), 0) : null,
         activeProjectsCount: client.projects.length,
-        outstandingInvoicesCount: hasFinancialAccess ? (client.invoices as any[]).filter(inv => inv.status !== "PAID").length : null,
+        outstandingInvoicesCount: hasFinancialAccess ? client.invoices.filter((inv: any) => inv.status !== "PAID").length : null,
         invoices: undefined,
         projects: undefined,
-      })) as any; // Escape hatch for complex composite types in cached results
+      }));
     },
 
     [cacheKey],
@@ -170,14 +170,16 @@ export async function getCachedClientById(id: string) {
 
       if (!client) return null;
 
+      const clientData = client as any;
+
       return {
           ...client,
           // Systematic mapping for complex types
-          projects: (client.projects as any[]).map(p => ({
+          projects: (clientData.projects as any[]).map((p: any) => ({
               ...p,
               budget: p.budget ? Number(p.budget) : null
           })),
-          invoices: hasFinancialAccess ? (client.invoices as any[]).map(inv => ({
+          invoices: hasFinancialAccess ? (clientData.invoices as any[]).map((inv: any) => ({
               ...inv,
               amount: Number(inv.amount)
           })) : []

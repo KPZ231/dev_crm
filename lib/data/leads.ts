@@ -47,9 +47,9 @@ export async function getCachedLeads(params: {
         workspaceId,
         ...(params.search && {
           OR: [
-            { companyName: { contains: params.search, mode: "insensitive" } },
-            { contactPerson: { contains: params.search, mode: "insensitive" } },
-            { email: { contains: params.search, mode: "insensitive" } }
+            { companyName: { contains: params.search, mode: "insensitive" as const } },
+            { contactPerson: { contains: params.search, mode: "insensitive" as const } },
+            { email: { contains: params.search, mode: "insensitive" as const } }
           ]
         }),
         ...(params.status && { status: params.status as LeadStatus })

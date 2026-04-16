@@ -91,10 +91,12 @@ export async function getProjectById(id: string): Promise<{ success: boolean; pr
 
     if (!prismaProject) throw new Error("Project not found");
 
+    const projectData = prismaProject as any;
+
     const project = {
       ...prismaProject,
       budget: prismaProject.budget ? Number(prismaProject.budget) : null,
-      invoices: prismaProject.invoices.map(inv => ({
+      invoices: (projectData.invoices as any[]).map((inv: any) => ({
           ...inv,
           amount: Number(inv.amount)
       }))

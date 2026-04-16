@@ -17,9 +17,9 @@ export async function getClients(workspaceId: string, filters?: ClientFilters): 
       workspaceId,
       ...(search && {
         OR: [
-          { companyName: { contains: search, mode: "insensitive" } },
-          { contactPerson: { contains: search, mode: "insensitive" } },
-          { email: { contains: search, mode: "insensitive" } },
+          { companyName: { contains: search, mode: "insensitive" as const } },
+          { contactPerson: { contains: search, mode: "insensitive" as const } },
+          { email: { contains: search, mode: "insensitive" as const } },
         ],
       }),
       ...(status && { status }),
@@ -187,12 +187,12 @@ export async function getClientStats(workspaceId: string, id: string) {
         }
       }
     }
-  });
+  }) as { invoices: { amount: number; status: string }[]; projects: { id: string }[] } | null;
 
   if (!stats) return null;
 
   return {
-    totalRevenue: hasFinancialAccess ? stats.invoices.reduce((acc, inv) => acc + inv.amount, 0) : null,
+    totalRevenue: hasFinancialAccess ? stats.invoices.reduce((acc: number, inv) => acc + inv.amount, 0) : null,
     activeProjects: stats.projects.length,
     outstandingInvoices: hasFinancialAccess ? stats.invoices.filter(inv => inv.status !== "PAID").length : null,
   };
