@@ -17,6 +17,8 @@ import { ClientDetailClient } from "./ClientDetailClient";
 import { canViewClientFinancials } from "@/lib/permissions";
 import { Invoice } from "@prisma/client";
 
+import { ClientActionsHeader } from "@/app/components/clients/ClientActionsHeader";
+
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
@@ -55,9 +57,16 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl font-bold text-[#fafafa] tracking-tight">{client.companyName}</h1>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyles(client.status)}`}>
-                    {client.status}
-                  </span>
+                  <div className="flex gap-2">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyles(client.status)}`}>
+                      {client.status}
+                    </span>
+                    {(client as any).isProjectFinished && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                        UKOŃCZONY
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[#a1a1aa] text-sm">
                   <div className="flex items-center gap-1.5">
@@ -80,14 +89,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button className="p-2.5 bg-[#141416] border border-[#27272a] rounded-lg text-[#a1a1aa] hover:text-[#fafafa] hover:border-[#a78bfa]/40 transition-all">
-                <Edit className="w-5 h-5" />
-              </button>
-              <button className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-6 py-2.5 rounded-lg transition-all shadow-lg">
-                Utwórz Projekt
-              </button>
-            </div>
+            <ClientActionsHeader 
+              clientId={client.id} 
+              companyName={client.companyName}
+              workspaceId={membership.workspaceId}
+              isProjectFinished={(client as any).isProjectFinished}
+            />
           </div>
         </div>
       </div>

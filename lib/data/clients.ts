@@ -35,18 +35,22 @@ export async function getCachedClients(params: {
   const { workspaceId, role } = context;
   const hasFinancialAccess = canViewClientFinancials(role);
 
-  const cacheKey = `clients-list-${workspaceId}-${role}-${params.search || "none"}-${params.status || "all"}-${params.paymentStatus || "all"}`;
+  // Normalize params for cache key stability
+  const searchKey = params.search?.trim().toLowerCase() || "all";
+  const statusKey = params.status || "all";
+  const paymentStatusKey = params.paymentStatus || "all";
 
   return unstable_cache(
     async () => {
-      const clients = await prisma.client.findMany({
+      return prisma.client.findMany({
         where: {
           workspaceId,
           ...(params.search && {
             OR: [
-              { companyName: { contains: params.search, mode: "insensitive" as const } },
-              { contactPerson: { contains: params.search, mode: "insensitive" as const } },
-              { email: { contains: params.search, mode: "insensitive" as const } },
+              { companyName: { contains: params.search, mode: "insensitive" } },
+              { contactPerson: { contains: params.search, mode: "insensitive" } },
+              { email: { contains: params.search, mode: "insensitive" } },
+              { nip: { contains: params.search, mode: "insensitive" } },
             ],
           }),
           ...(params.status && { status: params.status as ClientStatus }),
@@ -68,30 +72,27 @@ export async function getCachedClients(params: {
               documents: true,
             },
           },
-          // Only fetch sensitive data if role allows
           invoices: hasFinancialAccess ? {
             select: { amount: true, status: true },
-          } : { take: 0 }, // Using take: 0 instead of false for better Prisma type consistency
+          } : { take: 0 },
           projects: {
             where: { status: { notIn: ["COMPLETED", "CANCELLED"] } },
             select: { id: true },
           },
         },
         orderBy: { createdAt: "desc" },
-        cacheStrategy: { ttl: 60, swr: 60 }
+      }).then(clients => {
+        return clients.map(client => ({
+          ...client,
+          totalRevenue: hasFinancialAccess ? client.invoices.reduce((acc: number, inv: any) => acc + Number(inv.amount), 0) : null,
+          activeProjectsCount: client.projects.length,
+          outstandingInvoicesCount: hasFinancialAccess ? client.invoices.filter((inv: any) => inv.status !== "PAID").length : null,
+          invoices: undefined,
+          projects: undefined,
+        }));
       });
-
-      return (clients as any[]).map(client => ({
-        ...client,
-        totalRevenue: hasFinancialAccess ? client.invoices.reduce((acc: number, inv: any) => acc + Number(inv.amount), 0) : null,
-        activeProjectsCount: client.projects.length,
-        outstandingInvoicesCount: hasFinancialAccess ? client.invoices.filter((inv: any) => inv.status !== "PAID").length : null,
-        invoices: undefined,
-        projects: undefined,
-      }));
     },
-
-    [cacheKey],
+    ["clients-list", workspaceId, role, searchKey, statusKey, paymentStatusKey],
     {
       revalidate: 60,
       tags: ["clients", `workspace-${workspaceId}`]

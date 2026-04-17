@@ -53,11 +53,22 @@ export async function getTasks(workspaceId: string, filters?: TaskFilters): Prom
   });
 }
 
-export async function getKanbanBoard(workspaceId: string): Promise<KanbanData> {
+export async function getKanbanBoard(workspaceId: string, filters?: TaskFilters): Promise<KanbanData> {
   await requireWorkspacePermission(workspaceId, "read", "task");
 
+  const { priority, search } = filters || {};
+
   const tasks = await prisma.task.findMany({
-    where: { workspaceId },
+    where: { 
+      workspaceId,
+      ...(priority && { priority }),
+      ...(search && {
+        OR: [
+          { title: { contains: search, mode: "insensitive" as const } },
+          { description: { contains: search, mode: "insensitive" as const } }
+        ]
+      })
+    },
     include: {
       assignee: { select: { id: true, name: true, image: true } },
       project: { select: { id: true, name: true } }

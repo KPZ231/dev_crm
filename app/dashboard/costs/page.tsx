@@ -13,11 +13,10 @@ export const metadata = {
   description: "Zarządzanie kosztami operacyjnymi i projektowymi",
 };
 
-export default async function CostsPage({
-  searchParams,
-}: {
-  searchParams: { category?: string; projectId?: string };
+export default async function CostsPage(props: {
+  searchParams: Promise<{ category?: string; projectId?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.user?.id) return null;
 

@@ -3,13 +3,13 @@ import { ProjectStatus, BudgetType, ProjectRole } from "@prisma/client";
 
 export const createProjectSchema = z.object({
   name: z.string().min(1, "Nazwa projektu jest wymagana"),
-  clientId: z.string().nullable(),
-  description: z.string().nullable(),
+  clientId: z.string().optional().nullable().or(z.literal("")).transform(v => v === "" ? null : v),
+  description: z.string().optional().nullable().or(z.literal("")).transform(v => v === "" ? null : v),
   status: z.nativeEnum(ProjectStatus),
-  budget: z.coerce.number().nullable(),
-  budgetType: z.nativeEnum(BudgetType).nullable(),
-  startDate: z.coerce.date().nullable(),
-  endDate: z.coerce.date().nullable(),
+  budget: z.coerce.number().optional().nullable(),
+  budgetType: z.nativeEnum(BudgetType).optional().nullable(),
+  startDate: z.coerce.date().optional().nullable(),
+  endDate: z.coerce.date().optional().nullable(),
 });
 
 export const updateProjectSchema = createProjectSchema.extend({

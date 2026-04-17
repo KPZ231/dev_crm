@@ -12,17 +12,16 @@ export const metadata: Metadata = {
   description: "Zarządzaj bazą klientów i relacjami",
 };
 
-export default async function ClientsPage({
-  searchParams,
-}: {
-  searchParams: { 
+export default async function ClientsPage(props: {
+  searchParams: Promise<{ 
     search?: string; 
     status?: string; 
     paymentStatus?: string;
     sortBy?: string;
     sortOrder?: string;
-  };
+  }>;
 }) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.user?.id) return null;
 
