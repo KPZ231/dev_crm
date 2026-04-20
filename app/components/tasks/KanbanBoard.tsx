@@ -4,7 +4,6 @@ import { useState } from "react";
 import { KanbanData, TaskWithRelations } from "@/lib/types/task";
 import { TaskStatus } from "@prisma/client";
 import { moveTask } from "@/lib/actions/tasks";
-import { motion, AnimatePresence } from "motion/react";
 import { Plus, Clock } from "lucide-react";
 import Image from "next/image";
 import { TaskCreateModal } from "./TaskCreateModal";
@@ -16,7 +15,6 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ initialData, workspaceId }: KanbanBoardProps) {
   const [data, setData] = useState<KanbanData>(initialData);
-  const [isSyncing, setIsSyncing] = useState(false);
   const [createModalStatus, setCreateModalStatus] = useState<TaskStatus | null>(null);
 
   const statuses: TaskStatus[] = ["BACKLOG", "TODO", "IN_PROGRESS", "REVIEW", "BLOCKED", "DONE"];
@@ -50,14 +48,11 @@ export function KanbanBoard({ initialData, workspaceId }: KanbanBoardProps) {
     setData(newData);
 
     try {
-        setIsSyncing(true);
         await moveTask(workspaceId, taskId, targetStatus, newPosition);
     } catch (error) {
         console.error(error);
         alert("Błąd podczas przesuwania zadania.");
         setData(initialData); // Rollback
-    } finally {
-        setIsSyncing(false);
     }
   };
 

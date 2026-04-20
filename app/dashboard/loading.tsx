@@ -1,4 +1,4 @@
-import { TrendingUp, Users, Activity, BarChart3 } from "lucide-react";
+import { Activity } from "lucide-react";
 
 export default function DashboardLoading() {
   return (

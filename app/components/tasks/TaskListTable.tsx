@@ -7,7 +7,6 @@ import {
   User,
   ExternalLink
 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 import { TaskCreateModal } from "./TaskCreateModal";

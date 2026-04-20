@@ -3,9 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { 
   ShieldCheck, 
-  Users, 
-  Settings2, 
-  Building2,
   ChevronRight
 } from "lucide-react";
 import { getCachedWorkspaceMembers, getCachedInvitations } from "@/lib/data/admin";

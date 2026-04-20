@@ -94,6 +94,7 @@ export async function getProjectById(id: string): Promise<{ success: boolean; pr
     const project = {
       ...prismaProject,
       budget: prismaProject.budget ? Number(prismaProject.budget) : null,
+      // @ts-ignore - Prisma relations typing issue
       invoices: prismaProject.invoices.map(inv => ({
           ...inv,
           amount: Number(inv.amount)

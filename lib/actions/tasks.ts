@@ -40,8 +40,8 @@ export async function getTasks(workspaceId: string, filters?: TaskFilters): Prom
       ...(projectId && { projectId }),
       ...(search && {
         OR: [
-          { title: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } }
+          { title: { contains: search, mode: "insensitive" as const } },
+          { description: { contains: search, mode: "insensitive" as const } }
         ]
       })
     },

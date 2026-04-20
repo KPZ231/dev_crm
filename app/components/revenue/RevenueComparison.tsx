@@ -6,7 +6,6 @@ import {
   ArrowDownRight, 
   Target, 
   Zap, 
-  Calendar,
   AlertTriangle 
 } from "lucide-react";
 import { motion } from "motion/react";

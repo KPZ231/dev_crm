@@ -169,32 +169,34 @@ export async function getClientStats(workspaceId: string, id: string) {
   
   const hasFinancialAccess = ["OWNER", "ADMIN", "PM"].includes(role);
 
-  const stats = await prisma.client.findUnique({
+  // Check if client exists first
+  const clientExists = await prisma.client.findUnique({
     where: { id, workspaceId },
-    select: {
-      invoices: {
-        select: {
-          amount: true,
-          status: true,
-        }
-      },
-      projects: {
-        where: {
-          status: { notIn: ["COMPLETED", "CANCELLED"] }
-        },
-        select: {
-          id: true
-        }
-      }
-    }
+    select: { id: true }
   });
 
-  if (!stats) return null;
+  if (!clientExists) return null;
+
+  const [invoices, activeProjectsCount] = await Promise.all([
+    hasFinancialAccess 
+      ? prisma.invoice.findMany({
+          where: { clientId: id, workspaceId },
+          select: { amount: true, status: true }
+        })
+      : Promise.resolve([]),
+    prisma.project.count({
+      where: { 
+        clientId: id, 
+        workspaceId,
+        status: { notIn: ["COMPLETED", "CANCELLED"] }
+      }
+    })
+  ]);
 
   return {
-    totalRevenue: hasFinancialAccess ? stats.invoices.reduce((acc, inv) => acc + inv.amount, 0) : null,
-    activeProjects: stats.projects.length,
-    outstandingInvoices: hasFinancialAccess ? stats.invoices.filter(inv => inv.status !== "PAID").length : null,
+    totalRevenue: hasFinancialAccess ? invoices.reduce((acc, inv) => acc + inv.amount, 0) : null,
+    activeProjects: activeProjectsCount,
+    outstandingInvoices: hasFinancialAccess ? invoices.filter(inv => inv.status !== "PAID").length : null,
   };
 }
 

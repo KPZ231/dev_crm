@@ -3,12 +3,9 @@
 import { InvoiceWithClient } from "@/lib/types/revenue";
 import { 
   Receipt, 
-  ExternalLink, 
   ArrowUpRight, 
   Download,
-  Filter,
   Search,
-  MoreVertical 
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";

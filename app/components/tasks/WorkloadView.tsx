@@ -3,6 +3,7 @@
 import { WorkloadPoint } from "@/lib/types/task";
 import { User, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
+import Image from "next/image";
 
 interface WorkloadViewProps {
   workload: WorkloadPoint[];
@@ -27,7 +28,7 @@ export function WorkloadView({ workload }: WorkloadViewProps) {
           >
             <div className="flex items-center gap-4">
                 {point.userImage ? (
-                    <img src={point.userImage} className="w-12 h-12 rounded-2xl border border-[#27272a]" alt="" />
+                    <Image src={point.userImage} width={48} height={48} className="w-12 h-12 rounded-2xl border border-[#27272a] object-cover" alt={point.userName} />
                 ) : (
                     <div className="w-12 h-12 rounded-2xl bg-[#141416] border border-[#27272a] flex items-center justify-center">
                         <User className="w-6 h-6 text-[#52525b]" />

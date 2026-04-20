@@ -1,4 +1,4 @@
-import { Settings, User, Briefcase, LayoutDashboard } from "lucide-react";
+import { User, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {

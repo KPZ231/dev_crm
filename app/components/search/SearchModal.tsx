@@ -14,7 +14,8 @@ import {
     Zap,
     AlertCircle
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
+import { useCallback } from "react";
 import { SearchResult, SearchJobResponse } from "@/lib/types/search";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,39 @@ export function SearchModal({ onClose }: SearchModalProps) {
   const [error, setError] = useState<string | null>(null);
   const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
+  const startSearch = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setJobId(null);
+      setStatus(null);
+
+      const response = await fetch("/api/search", {
+        method: "POST",
+        body: JSON.stringify({ query }),
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+      const data = await response.json();
+      setJobId(data.jobId);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd");
+      setIsLoading(false);
+    }
+  }, [query]);
+
+  const checkStatus = useCallback(async () => {
+    if (!jobId) return;
+    try {
+      const response = await fetch(`/api/search?jobId=${jobId}`);
+      if (!response.ok) throw new Error("Status check failed");
+      const data = await response.json();
+      setStatus(data);
+    } catch (err) {
+        console.error(err);
+    }
+  }, [jobId]);
+
   // Debounced search trigger
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,7 +72,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
       }
     }, 1000);
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, startSearch]);
 
   // Polling logic
   useEffect(() => {
@@ -58,40 +92,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
         if (pollInterval.current) clearInterval(pollInterval.current);
         pollInterval.current = null;
     };
-  }, [jobId, status]);
-
-  const startSearch = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      setJobId(null);
-      setStatus(null);
-
-      const response = await fetch("/api/search", {
-        method: "POST",
-        body: JSON.stringify({ query }),
-      });
-
-      if (!response.ok) throw new Error(await response.text());
-      const data = await response.json();
-      setJobId(data.jobId);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd");
-      setIsLoading(false);
-    }
-  };
-
-  const checkStatus = async () => {
-    if (!jobId) return;
-    try {
-      const response = await fetch(`/api/search?jobId=${jobId}`);
-      if (!response.ok) throw new Error("Status check failed");
-      const data = await response.json();
-      setStatus(data);
-    } catch (err) {
-        console.error(err);
-    }
-  };
+  }, [jobId, status, checkStatus]);
 
   return (
     <motion.div 
