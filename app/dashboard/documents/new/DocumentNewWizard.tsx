@@ -39,7 +39,7 @@ export function DocumentNewWizard({ templates, clients, leads, workspaceId, user
     try {
       setIsLoading(true);
       
-      let initialContent = "";
+      let initialContent: any = { html: "", design: null };
       if (templateId) {
           // In a real app we'd fetch the entity data first
           const entityData = linkedTo 
@@ -49,7 +49,7 @@ export function DocumentNewWizard({ templates, clients, leads, workspaceId, user
             : undefined;
             
           const gen = await generateDocumentFromTemplate(workspaceId, templateId, entityData || {});
-          initialContent = gen.content;
+          initialContent = { html: gen.content, design: gen.design };
       }
 
       const doc = await createDocument(workspaceId, {

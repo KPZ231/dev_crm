@@ -50,14 +50,14 @@ export function LeadsListPageClient({ leads, showFinancials, searchParams }: Lea
       />
 
       <div className={cn(
-          "flex-grow overflow-auto transition-all duration-300",
+          "p-8 grow overflow-auto custom-scrollbar transition-all duration-300",
           isPending && "opacity-40 grayscale-[0.5] pointer-events-none"
       )}>
         {isPending && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09090b]/10 backdrop-blur-[1px]">
                 <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-[#0c0c0f] border border-[#27272a] shadow-2xl">
                     <Loader2 className="w-8 h-8 text-[#a78bfa] animate-spin" />
-                    <span className="text-xs font-bold text-[#fafafa] uppercase tracking-widest">Aktualizacja bazy...</span>
+                    <span className="text-xs font-bold text-[#fafafa] uppercase tracking-widest">Aktualizacja leada...</span>
                 </div>
             </div>
         )}

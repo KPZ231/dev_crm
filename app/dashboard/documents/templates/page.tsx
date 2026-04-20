@@ -25,7 +25,7 @@ export default async function TemplatesPage() {
         </Link>
       </div>
 
-      <TemplatesManager templates={templates} onNewTemplate={() => {}} />
+      <TemplatesManager workspaceId={membership.workspaceId} templates={templates} />
     </div>
   );
 }

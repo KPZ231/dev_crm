@@ -70,6 +70,7 @@ export async function createDocument(workspaceId: string, data: any) {
   return document;
 }
 
+
 export async function generateDocumentFromTemplate(workspaceId: string, templateId: string, entityData: any) {
   await requireWorkspacePermission(workspaceId, "create", "document");
 
@@ -83,6 +84,7 @@ export async function generateDocumentFromTemplate(workspaceId: string, template
 
   return {
     content: filledContent,
+    design: template.design,
     type: template.type,
     name: `${template.name} - ${entityData.companyName || "Draft"}`
   };
@@ -129,6 +131,14 @@ export async function getTemplates(workspaceId: string): Promise<DocumentTemplat
   });
 }
 
+export async function getTemplateById(workspaceId: string, id: string) {
+  await requireWorkspacePermission(workspaceId, "read", "document");
+
+  return await prisma.documentTemplate.findUnique({
+    where: { id, workspaceId }
+  });
+}
+
 export async function createTemplate(workspaceId: string, data: any) {
   await requireWorkspacePermission(workspaceId, "update", "document");
   
@@ -143,6 +153,32 @@ export async function createTemplate(workspaceId: string, data: any) {
 
   revalidatePath("/dashboard/documents/templates");
   return template;
+}
+
+export async function updateTemplate(workspaceId: string, id: string, data: any) {
+  await requireWorkspacePermission(workspaceId, "update", "document");
+  
+  const validated = templateSchema.partial().parse(data);
+
+  const template = await prisma.documentTemplate.update({
+    where: { id, workspaceId },
+    data: validated
+  });
+
+  revalidatePath(`/dashboard/documents/templates/${id}`);
+  revalidatePath("/dashboard/documents/templates");
+  return template;
+}
+
+export async function deleteTemplate(workspaceId: string, id: string) {
+  await requireWorkspacePermission(workspaceId, "delete", "document");
+  
+  await prisma.documentTemplate.delete({
+    where: { id, workspaceId }
+  });
+
+  revalidatePath("/dashboard/documents/templates");
+  return { success: true };
 }
 
 export async function exportDocumentToPdf(workspaceId: string, id: string) {

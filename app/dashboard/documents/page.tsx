@@ -2,11 +2,11 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getDocuments } from "@/lib/actions/documents";
 import { DocumentsTable } from "@/app/components/documents/DocumentsTable";
+import { DocumentFilters } from "@/app/components/documents/DocumentFilters";
 import { 
     FileText, 
     Plus, 
     Layout, 
-    Search
 } from "lucide-react";
 import Link from "next/link";
 import { DocumentType, DocumentStatus } from "@prisma/client";
@@ -19,10 +19,12 @@ export const metadata = {
 export default async function DocumentsPage({
   searchParams,
 }: {
-  searchParams: { type?: string; status?: string; search?: string };
+  searchParams: Promise<{ type?: string; status?: string; search?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) return null;
+
+  const currentSearchParams = await searchParams;
 
   const membership = await prisma.workspaceMember.findFirst({
     where: { userId: session.user.id }
@@ -31,9 +33,9 @@ export default async function DocumentsPage({
   if (!membership) return null;
 
   const documents = await getDocuments(membership.workspaceId, {
-    type: searchParams.type as DocumentType,
-    status: searchParams.status as DocumentStatus,
-    search: searchParams.search
+    type: currentSearchParams.type as DocumentType,
+    status: currentSearchParams.status as DocumentStatus,
+    search: currentSearchParams.search
   });
 
   return (
@@ -45,7 +47,7 @@ export default async function DocumentsPage({
             Workspace Assets
           </div>
           <h1 className="text-4xl font-bold text-[#fafafa] tracking-tight">Dokumenty</h1>
-          <p className="text-[#52525b] text-sm">Zarządzaj ofertami, umowami i briefami w jednym miejscu</p>
+          <p className="text-[#52525b] text-sm">Zarządzaj ofertami, umowami, protokołami i briefami</p>
         </div>
 
         <div className="flex items-center gap-4">
@@ -64,40 +66,12 @@ export default async function DocumentsPage({
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-6 p-2">
-        <div className="flex flex-wrap items-center gap-3">
-             <FilterItem label="Wszystkie" active={!searchParams.type} href="/dashboard/documents" />
-             <FilterItem label="Oferty" active={searchParams.type === 'OFFER'} href="/dashboard/documents?type=OFFER" />
-             <FilterItem label="Umowy" active={searchParams.type === 'CONTRACT'} href="/dashboard/documents?type=CONTRACT" />
-             <FilterItem label="Briefy" active={searchParams.type === 'BRIEF'} href="/dashboard/documents?type=BRIEF" />
-        </div>
-
-        <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#52525b]" />
-            <input 
-                placeholder="Szukaj dokumentu..."
-                className="bg-[#0c0c0f] border border-[#27272a] rounded-xl pl-10 pr-4 py-2 text-xs text-[#fafafa] focus:border-[#a78bfa] transition-all outline-none"
-            />
-        </div>
-      </div>
+      <DocumentFilters 
+        initialSearch={currentSearchParams.search} 
+        initialType={currentSearchParams.type} 
+      />
 
       <DocumentsTable documents={documents} />
     </div>
   );
-}
-
-function FilterItem({ label, active, href }: { label: string; active: boolean; href: string }) {
-    return (
-        <Link 
-            href={href}
-            className={`px-4 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-widest border transition-all ${
-                active 
-                    ? 'bg-[#a78bfa] border-[#a78bfa] text-[#09090b]' 
-                    : 'bg-[#0c0c0f] border-[#27272a] text-[#52525b] hover:text-[#a1a1aa]'
-            }`}
-        >
-            {label}
-        </Link>
-    );
 }

@@ -183,22 +183,20 @@ export async function getClientStats(workspaceId: string, id: string) {
           where: { clientId: id, workspaceId },
           select: { amount: true, status: true }
         })
-      : Promise.resolve([]),
+      : Promise.resolve([] as { amount: any; status: string }[]),
     prisma.project.count({
       where: { 
         clientId: id, 
         workspaceId,
         status: { notIn: ["COMPLETED", "CANCELLED"] }
       }
-    }
-  }) as { invoices: { amount: number; status: string }[]; projects: { id: string }[] } | null;
-
-  if (!stats) return null;
+    })
+  ]);
 
   return {
-    totalRevenue: hasFinancialAccess ? stats.invoices.reduce((acc, inv) => acc + inv.amount, 0) : null,
-    activeProjects: stats.projects.length,
-    outstandingInvoices: hasFinancialAccess ? stats.invoices.filter(inv => inv.status !== "PAID").length : null,
+    totalRevenue: hasFinancialAccess ? invoices.reduce((acc, inv) => acc + Number(inv.amount), 0) : null,
+    activeProjects: activeProjectsCount,
+    outstandingInvoices: hasFinancialAccess ? invoices.filter(inv => inv.status !== "PAID").length : null,
   };
 }
 

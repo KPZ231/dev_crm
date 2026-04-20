@@ -18,6 +18,7 @@ export const templateSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   type: z.nativeEnum(DocumentType),
   content: z.string().min(10, "Template content must be at least 10 characters"),
+  design: z.any().optional(),
 });
 
 export type TemplateFormValues = z.infer<typeof templateSchema>;

@@ -24,7 +24,7 @@ export function ClientForm({ initialData, onSubmit, onCancel, isLoading }: Clien
       status: ClientStatus.ACTIVE,
       paymentStatus: PaymentStatus.UP_TO_DATE,
       ...initialData,
-    },
+    } as ClientFormValues,
   });
 
   return (

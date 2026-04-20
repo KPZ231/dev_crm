@@ -431,7 +431,6 @@ enum DocumentType {
   CONTRACT
   BRIEF
   PROTOCOL
-  INVOICE
   SUMMARY
 }
 
@@ -469,6 +468,7 @@ model DocumentTemplate {
   name        String
   type        DocumentType
   content     String       @db.Text // HTML or Markdown with variables
+  design      Json?        // Stores logo, primaryColor, typography, signatureData etc.
   
   workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   documents   Document[]
