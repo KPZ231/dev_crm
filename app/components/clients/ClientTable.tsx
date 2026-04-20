@@ -63,9 +63,16 @@ export function ClientTable({ clients }: ClientTableProps) {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1">
-                    <span className={`inline-flex w-fit px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyles(client.status)}`}>
-                      {client.status}
-                    </span>
+                    <div className="flex gap-1 flex-wrap">
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyles(client.status)}`}>
+                        {client.status}
+                      </span>
+                      {client.isProjectFinished && (
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                          UKOŃCZONY
+                        </span>
+                      )}
+                    </div>
                     <span className={`inline-flex w-fit px-2 py-0.5 rounded-full text-[10px] font-bold border ${getPaymentStatusStyles(client.paymentStatus)}`}>
                       {client.paymentStatus}
                     </span>

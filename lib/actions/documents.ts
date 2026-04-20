@@ -22,7 +22,7 @@ export async function getDocuments(workspaceId: string, filters?: DocumentFilter
       ...(leadId && { leadId }),
       ...(projectId && { projectId }),
       ...(search && {
-        name: { contains: search, mode: "insensitive" }
+        name: { contains: search, mode: "insensitive" as const }
       })
     },
     include: {

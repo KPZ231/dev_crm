@@ -120,23 +120,25 @@ export function ClientForm({ initialData, onSubmit, onCancel, isLoading }: Clien
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#27272a]">
         <div className="space-y-2">
-          <label className="text-xs font-medium text-[#a1a1aa]">Status relacji</label>
+          <label className="text-xs font-medium text-[#a1a1aa]">Status relacji *</label>
           <select
             {...register("status")}
-            className="w-full bg-[#141416] border border-[#27272a] rounded-lg px-4 py-2.5 text-sm text-[#fafafa] focus:border-[#a78bfa] outline-none transition-all appearance-none"
+            className="w-full bg-[#141416] border border-[#27272a] rounded-lg px-4 py-2.5 text-sm text-[#fafafa] focus:border-[#a78bfa] focus:ring-1 focus:ring-[#a78bfa] outline-none transition-all appearance-none"
           >
             {Object.values(ClientStatus).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
+          {errors.status && <p className="text-[10px] text-red-400">{errors.status.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-medium text-[#a1a1aa]">Status płatności</label>
+          <label className="text-xs font-medium text-[#a1a1aa]">Status płatności *</label>
           <select
             {...register("paymentStatus")}
-            className="w-full bg-[#141416] border border-[#27272a] rounded-lg px-4 py-2.5 text-sm text-[#fafafa] focus:border-[#a78bfa] outline-none transition-all appearance-none"
+            className="w-full bg-[#141416] border border-[#27272a] rounded-lg px-4 py-2.5 text-sm text-[#fafafa] focus:border-[#a78bfa] focus:ring-1 focus:ring-[#a78bfa] outline-none transition-all appearance-none"
           >
             {Object.values(PaymentStatus).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
+          {errors.paymentStatus && <p className="text-[10px] text-red-400">{errors.paymentStatus.message}</p>}
         </div>
       </div>
 

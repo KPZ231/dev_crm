@@ -134,10 +134,12 @@ export async function getCachedProjectById(id: string) {
 
       if (!project) return null;
 
+      const projectData = project as any;
+
       return {
         ...project,
         budget: project.budget ? Number(project.budget) : null,
-        invoices: project.invoices.map(inv => ({
+        invoices: (projectData.invoices as any[]).map((inv: any) => ({
           ...inv,
           amount: Number(inv.amount)
         }))

@@ -262,6 +262,7 @@ model Client {
   paymentStatus   PaymentStatus @default(UP_TO_DATE)
   contractedSince DateTime?
   notes           String?      @db.Text
+  isProjectFinished Boolean    @default(false)
   
   workspace       Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   activities      ClientActivity[]
@@ -342,7 +343,7 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  client      Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  client      Client? @relation(fields: [clientId], references: [id], onDelete: Cascade)
   tasks       Task[]
   costs       Cost[]
   documents   Document[]
@@ -448,7 +449,7 @@ model Document {
   fileUrl     String?        // Link to generated PDF if available
   
   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  client      Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  client      Client?         @relation(fields: [clientId], references: [id], onDelete: Cascade)
   lead        Lead?           @relation(fields: [leadId], references: [id], onDelete: SetNull)
   project     Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
   template    DocumentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)

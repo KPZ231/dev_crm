@@ -180,8 +180,8 @@ export async function getInvoiceList(workspaceId: string, filters: InvoiceFilter
       ...(clientId && { clientId }),
       ...(search && {
         OR: [
-          { number: { contains: search, mode: "insensitive" } },
-          { client: { companyName: { contains: search, mode: "insensitive" } } }
+          { number: { contains: search, mode: "insensitive" as const } },
+          { client: { companyName: { contains: search, mode: "insensitive" as const } } }
         ]
       })
     },

@@ -17,9 +17,9 @@ export async function getClients(workspaceId: string, filters?: ClientFilters): 
       workspaceId,
       ...(search && {
         OR: [
-          { companyName: { contains: search, mode: "insensitive" } },
-          { contactPerson: { contains: search, mode: "insensitive" } },
-          { email: { contains: search, mode: "insensitive" } },
+          { companyName: { contains: search, mode: "insensitive" as const } },
+          { contactPerson: { contains: search, mode: "insensitive" as const } },
+          { email: { contains: search, mode: "insensitive" as const } },
         ],
       }),
       ...(status && { status }),
@@ -40,9 +40,9 @@ export async function getClients(workspaceId: string, filters?: ClientFilters): 
         }
       },
       projects: {
-          where: {
-              status: { notIn: ["COMPLETED", "CANCELLED"] }
-          }
+        where: {
+          status: { notIn: ["COMPLETED", "CANCELLED"] }
+        }
       }
     },
     orderBy: {
@@ -94,8 +94,8 @@ export async function getClientById(workspaceId: string, id: string): Promise<Cl
     // Convert decimals to numbers
     // @ts-ignore
     client.projects = client.projects.map(p => ({
-        ...p,
-        budget: p.budget ? Number(p.budget) : null
+      ...p,
+      budget: p.budget ? Number(p.budget) : null
     }));
   }
 
@@ -104,7 +104,7 @@ export async function getClientById(workspaceId: string, id: string): Promise<Cl
 
 export async function createClient(workspaceId: string, data: any) {
   const { user } = await requireWorkspacePermission(workspaceId, "create", "client");
-  
+
   const validated = clientSchema.parse(data);
 
   const client = await prisma.$transaction(async (tx) => {
@@ -127,15 +127,15 @@ export async function createClient(workspaceId: string, data: any) {
     return newClient;
   });
 
-  revalidateTag("clients", "max");
-  revalidateTag(`workspace-${workspaceId}`, "max");
+  revalidateTag("clients");
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath("/dashboard/clients");
   return client;
 }
 
 export async function updateClient(workspaceId: string, id: string, data: any) {
   const { user } = await requireWorkspacePermission(workspaceId, "update", "client");
-  
+
   const validated = clientUpdateSchema.parse(data);
 
   const client = await prisma.$transaction(async (tx) => {
@@ -156,9 +156,9 @@ export async function updateClient(workspaceId: string, id: string, data: any) {
     return updatedClient;
   });
 
-  revalidateTag("clients", "max");
-  revalidateTag(`client-${id}`, "max");
-  revalidateTag(`workspace-${workspaceId}`, "max");
+  revalidateTag("clients");
+  revalidateTag(`client-${id}`);
+  revalidateTag(`workspace-${workspaceId}`);
   revalidatePath(`/dashboard/clients/${id}`);
   revalidatePath("/dashboard/clients");
   return client;
@@ -166,7 +166,7 @@ export async function updateClient(workspaceId: string, id: string, data: any) {
 
 export async function getClientStats(workspaceId: string, id: string) {
   const { role } = await requireWorkspacePermission(workspaceId, "read", "client");
-  
+
   const hasFinancialAccess = ["OWNER", "ADMIN", "PM"].includes(role);
 
   // Check if client exists first
@@ -190,13 +190,15 @@ export async function getClientStats(workspaceId: string, id: string) {
         workspaceId,
         status: { notIn: ["COMPLETED", "CANCELLED"] }
       }
-    })
-  ]);
+    }
+  }) as { invoices: { amount: number; status: string }[]; projects: { id: string }[] } | null;
+
+  if (!stats) return null;
 
   return {
-    totalRevenue: hasFinancialAccess ? invoices.reduce((acc, inv) => acc + inv.amount, 0) : null,
-    activeProjects: activeProjectsCount,
-    outstandingInvoices: hasFinancialAccess ? invoices.filter(inv => inv.status !== "PAID").length : null,
+    totalRevenue: hasFinancialAccess ? stats.invoices.reduce((acc, inv) => acc + inv.amount, 0) : null,
+    activeProjects: stats.projects.length,
+    outstandingInvoices: hasFinancialAccess ? stats.invoices.filter(inv => inv.status !== "PAID").length : null,
   };
 }
 
@@ -212,4 +214,41 @@ export async function getClientTimeline(workspaceId: string, id: string) {
     },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export async function deleteClient(workspaceId: string, id: string) {
+  await requireWorkspacePermission(workspaceId, "delete", "client");
+
+  await prisma.client.delete({
+    where: { id, workspaceId },
+  });
+
+  revalidateTag("clients");
+  revalidateTag(`workspace-${workspaceId}`);
+  revalidatePath("/dashboard/clients");
+  return { success: true };
+}
+
+export async function toggleProjectFinished(workspaceId: string, id: string, isFinished: boolean) {
+  const { user } = await requireWorkspacePermission(workspaceId, "update", "client");
+
+  const client = await prisma.client.update({
+    where: { id, workspaceId },
+    data: { isProjectFinished: isFinished },
+  });
+
+  await prisma.clientActivity.create({
+    data: {
+      clientId: id,
+      actorId: user.id!,
+      action: "STATUS_CHANGED",
+      content: `Oznaczono projekt jako ${isFinished ? "UKOŃCZONY" : "W TRAKCIE"}.`,
+    },
+  });
+
+  revalidateTag("clients");
+  revalidateTag(`client-${id}`);
+  revalidateTag(`workspace-${workspaceId}`);
+  revalidatePath(`/dashboard/clients/${id}`);
+  return client;
 }

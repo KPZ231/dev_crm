@@ -4,18 +4,18 @@ import { ClientStatus, PaymentStatus } from "@prisma/client";
 const nipRegex = /^\d{10}$/;
 
 export const clientSchema = z.object({
-  companyName: z.string().min(2, "Company name must be at least 2 characters"),
-  nip: z.string().regex(nipRegex, "NIP must be exactly 10 digits").nullable(),
-  address: z.string().nullable(),
-  website: z.string().url("Invalid URL").nullable().or(z.literal("")),
-  contactPerson: z.string().min(2, "Contact person name must be at least 2 characters"),
-  email: z.string().email("Invalid email address").nullable().or(z.literal("")),
-  phone: z.string().nullable(),
-  industry: z.string().nullable(),
+  companyName: z.string().min(2, "Nazwa firmy musi mieć co najmniej 2 znaki"),
+  nip: z.string().regex(nipRegex, "NIP musi składać się z 10 cyfr").optional().or(z.literal("")).nullable().transform(v => v === "" ? null : v),
+  address: z.string().optional().nullable().transform(v => v === "" ? null : v),
+  website: z.string().url("Niepoprawny URL").optional().or(z.literal("")).nullable().transform(v => v === "" ? null : v),
+  contactPerson: z.string().min(2, "Osoba kontaktowa musi mieć co najmniej 2 znaki"),
+  email: z.string().email("Niepoprawny adres email").optional().or(z.literal("")).nullable().transform(v => v === "" ? null : v),
+  phone: z.string().optional().nullable().transform(v => v === "" ? null : v),
+  industry: z.string().optional().nullable().transform(v => v === "" ? null : v),
   status: z.nativeEnum(ClientStatus),
   paymentStatus: z.nativeEnum(PaymentStatus),
-  contractedSince: z.date().nullable(),
-  notes: z.string().nullable(),
+  contractedSince: z.coerce.date().optional().nullable(),
+  notes: z.string().optional().nullable().transform(v => v === "" ? null : v),
 });
 
 export type ClientFormValues = z.infer<typeof clientSchema>;

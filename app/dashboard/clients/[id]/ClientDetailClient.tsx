@@ -14,6 +14,7 @@ import {
 import { Project, Invoice, Document } from "@prisma/client";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import Link from "next/link";
 
 interface ClientDetailClientProps {
   client: ClientWithDetails;
@@ -77,9 +78,12 @@ export function ClientDetailClient({ client, showFinancials }: ClientDetailClien
           <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-[#fafafa]">Aktywne projekty</h3>
-                <button className="flex items-center gap-2 text-sm text-[#a78bfa] hover:underline transition-all">
+                <Link 
+                  href={`/dashboard/projects/new?clientId=${client.id}`}
+                  className="flex items-center gap-2 text-sm text-[#a78bfa] hover:text-[#8b5cf6] transition-all font-medium"
+                >
                     <Plus className="w-4 h-4" /> Nowy Projekt
-                </button>
+                </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                {client.projects.map((p: Project) => (

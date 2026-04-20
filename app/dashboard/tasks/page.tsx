@@ -1,8 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTasks } from "@/lib/actions/tasks";
-import { TaskListTable } from "@/app/components/tasks/TaskListTable";
-import { TaskHeader } from "@/app/components/tasks/TaskHeader";
+import { TasksListPageClient } from "./TasksListPageClient";
 import { TaskStatus, TaskPriority } from "@prisma/client";
 
 export const metadata = {
@@ -10,11 +9,10 @@ export const metadata = {
   description: "Zestawienie wszystkich zadań",
 };
 
-export default async function TasksListPage({
-  searchParams,
-}: {
-  searchParams: { status?: string; priority?: string; search?: string };
+export default async function TasksListPage(props: {
+  searchParams: Promise<{ status?: string; priority?: string; search?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.user?.id) return null;
 
@@ -31,11 +29,10 @@ export default async function TasksListPage({
   });
 
   return (
-    <div className="p-8 lg:p-12 animate-in fade-in duration-500">
-      <TaskHeader workspaceId={membership.workspaceId} />
-      <div className="space-y-6">
-        <TaskListTable tasks={tasks} workspaceId={membership.workspaceId} />
-      </div>
+    <div className="p-8 lg:p-12 animate-in fade-in duration-500 min-h-screen">
+      <TasksListPageClient tasks={tasks} workspaceId={membership.workspaceId} />
     </div>
   );
 }
+
+

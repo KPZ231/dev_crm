@@ -39,7 +39,8 @@ export async function getCachedLeads(params: {
   const pageSize = params.pageSize || 20;
   const skip = (page - 1) * pageSize;
 
-  const cacheKey = `leads-list-${workspaceId}-${role}-${params.search || "none"}-${params.status || "all"}-${page}`;
+  const searchKey = params.search?.trim().toLowerCase() || "all";
+  const statusKey = params.status || "all";
 
   return unstable_cache(
     async () => {
@@ -73,15 +74,14 @@ export async function getCachedLeads(params: {
           },
           orderBy: { createdAt: "desc" },
           take: pageSize,
-          skip,
-          cacheStrategy: { ttl: 60, swr: 60 }
+          skip
         }),
         prisma.lead.count({ where })
       ]);
 
       return { leads, totalCount };
     },
-    [cacheKey],
+    ["leads-list", workspaceId, role, searchKey, statusKey, page.toString()],
     {
       revalidate: 60,
       tags: ["leads", `workspace-${workspaceId}`]

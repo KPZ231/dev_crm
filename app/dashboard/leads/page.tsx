@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { getCachedLeads } from "@/lib/data/leads";
-import { LeadTable } from "@/app/components/leads/LeadTable";
-import { LeadFilters } from "@/app/components/leads/LeadFilters";
+import { LeadsListPageClient } from "./LeadsListPageClient";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -14,16 +13,13 @@ export const metadata: Metadata = {
   description: "Zarządzaj swoimi leadami",
 };
 
-export default async function LeadsPage({
-  searchParams,
-}: {
-  searchParams: { search?: string; status?: string; page?: string };
+export default async function LeadsPage(props: {
+  searchParams: Promise<{ search?: string; status?: string; page?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  // We still need the role for UI permissions (canCreate, showFinancials)
-  // But data fetching is now handled by the optimized data layer
   const member = await prisma.workspaceMember.findFirst({
     where: { userId: session.user.id },
     select: { role: true }
@@ -60,14 +56,12 @@ export default async function LeadsPage({
         )}
       </div>
 
-      <LeadFilters 
-        initialSearch={searchParams.search} 
-        initialStatus={searchParams.status} 
+      <LeadsListPageClient 
+        leads={leads as LeadWithAssignee[]} 
+        showFinancials={showFinancials} 
+        searchParams={searchParams}
       />
-
-      <div className="flex-grow overflow-auto">
-        <LeadTable leads={leads as LeadWithAssignee[]} showFinancials={showFinancials} />
-      </div>
     </div>
   );
 }
+
