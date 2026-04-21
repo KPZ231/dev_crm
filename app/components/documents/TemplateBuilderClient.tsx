@@ -9,7 +9,7 @@ import { WYSIWYGEditor, EditorDesign } from "./WYSIWYGEditor";
 
 interface TemplateBuilderProps {
   workspaceId: string;
-  initialData?: any;
+  initialData?: Record<string, unknown>;
 }
 
 export function TemplateBuilderClient({ workspaceId, initialData }: TemplateBuilderProps) {

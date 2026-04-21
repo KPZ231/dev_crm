@@ -33,11 +33,11 @@ export function ClientEditClient({ client, workspaceId }: ClientEditClientProps)
   }
 
   return (
-    <ClientForm 
-      initialData={client as any} 
-      onSubmit={onSubmit} 
-      onCancel={() => router.push(`/dashboard/clients/${client.id}`)} 
-      isLoading={isLoading} 
+    <ClientForm
+      initialData={client}
+      onSubmit={onSubmit}
+      onCancel={() => router.push(`/dashboard/clients/${client.id}`)}
+      isLoading={isLoading}
     />
   );
 }

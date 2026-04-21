@@ -30,8 +30,8 @@ export function DeleteClientModal({ clientId, companyName, workspaceId, isOpen, 
       toast.success("Klient został pomyślnie usunięty");
       router.push("/dashboard/clients");
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || "Błąd podczas usuwania klienta");
+    } catch (error) {
+      toast.error(error?.message || "Błąd podczas usuwania klienta");
     } finally {
       setIsDeleting(false);
     }

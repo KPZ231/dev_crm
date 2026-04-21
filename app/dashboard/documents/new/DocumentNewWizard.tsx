@@ -39,7 +39,9 @@ export function DocumentNewWizard({ templates, clients, leads, workspaceId, user
     try {
       setIsLoading(true);
       
-      let initialContent: any = { html: "", design: null };
+      let content = "";
+      let design = null;
+
       if (templateId) {
           // In a real app we'd fetch the entity data first
           const entityData = linkedTo 
@@ -49,7 +51,8 @@ export function DocumentNewWizard({ templates, clients, leads, workspaceId, user
             : undefined;
             
           const gen = await generateDocumentFromTemplate(workspaceId, templateId, entityData || {});
-          initialContent = { html: gen.content, design: gen.design };
+          content = gen.content;
+          design = gen.design as EditorDesign;
       }
 
       const doc = await createDocument(workspaceId, {
@@ -58,7 +61,8 @@ export function DocumentNewWizard({ templates, clients, leads, workspaceId, user
         templateId,
         clientId: linkedTo?.type === 'client' ? linkedTo.id : null,
         leadId: linkedTo?.type === 'lead' ? linkedTo.id : null,
-        content: initialContent
+        content,
+        design
       });
 
       router.push(`/dashboard/documents/${doc.id}`);

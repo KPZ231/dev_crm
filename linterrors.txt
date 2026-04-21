@@ -1,41 +1,106 @@
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\revenue\InvoiceTable.tsx
-   6:3  warning  'ExternalLink' is defined but never used  @typescript-eslint/no-unused-vars
-   9:3  warning  'Filter' is defined but never used        @typescript-eslint/no-unused-vars
-  11:3  warning  'MoreVertical' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\api\documents\[id]\pdf\route.ts
+  30:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\revenue\RevenueComparison.tsx
-  9:3  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\clients\ClientActionsHeader.tsx
+  29:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\search\SearchModal.tsx
-  17:18  warning  'AnimatePresence' is defined but never used                                                                     @typescript-eslint/no-unused-vars
-  41:6   warning  React Hook useEffect has a missing dependency: 'startSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  61:6   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\clients\ClientFilters.tsx
+   3:10  warning  'useTransition' is defined but never used                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   4:10  warning  'useRouter' is defined but never used                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   4:21  warning  'usePathname' is defined but never used                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   4:34  warning  'useSearchParams' is defined but never used                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  41:6   warning  React Hook useEffect has missing dependencies: 'initialSearch' and 'onFilterChange'. Either include them or remove the dependency array. If 'onFilterChange' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\tasks\KanbanBoard.tsx
-   7:10  warning  'motion' is defined but never used              @typescript-eslint/no-unused-vars
-   7:18  warning  'AnimatePresence' is defined but never used     @typescript-eslint/no-unused-vars
-  19:10  warning  'isSyncing' is assigned a value but never used  @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\clients\DeleteClientModal.tsx
+  33:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\tasks\TaskListTable.tsx
-  10:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\documents\DocumentFilters.tsx
+   7:8   warning  'Link' is defined but never used         @typescript-eslint/no-unused-vars
+  14:50  warning  'initialType' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\tasks\WorkloadView.tsx
-  30:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\documents\TemplateBuilderClient.tsx
+  12:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\admin\page.tsx
-  6:3  warning  'Users' is defined but never used      @typescript-eslint/no-unused-vars
-  7:3  warning  'Settings2' is defined but never used  @typescript-eslint/no-unused-vars
-  8:3  warning  'Building2' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\documents\TemplatesManager.tsx
+  27:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  36:22  warning  'error' is defined but never used            @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\loading.tsx
-  1:10  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
-  1:22  warning  'Users' is defined but never used       @typescript-eslint/no-unused-vars
-  1:39  warning  'BarChart3' is defined but never used   @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\documents\WYSIWYGEditor.tsx
+   22:3    warning  'FileText' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   53:19   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   54:37   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   56:107  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   56:122  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   62:18   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   98:87   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  101:61   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  123:91   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  160:27   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  181:27   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  549:25   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  576:29   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  606:10   warning  'VariableTag' is defined but never used                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
 
-C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\profile\page.tsx
-  1:10  warning  'Settings' is defined but never used   @typescript-eslint/no-unused-vars
-  1:26  warning  'Briefcase' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\leads\LeadFilters.tsx
+   3:10  warning  'useTransition' is defined but never used                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   4:10  warning  'useRouter' is defined but never used                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   4:21  warning  'usePathname' is defined but never used                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   4:34  warning  'useSearchParams' is defined but never used                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  35:6   warning  React Hook useEffect has missing dependencies: 'initialSearch' and 'onFilterChange'. Either include them or remove the dependency array. If 'onFilterChange' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
 
-Ôťľ 20 problems (0 errors, 20 warnings)
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\leads\LeadTable.tsx
+  12:3  warning  'MoreHorizontal' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\tasks\TaskFilters.tsx
+  3:27  warning  'useRouter' is defined but never used      @typescript-eslint/no-unused-vars
+  3:38  warning  'usePathname' is defined but never used    @typescript-eslint/no-unused-vars
+  4:10  warning  'useTransition' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\components\tasks\TaskHeader.tsx
+   4:23  warning  'useRouter' is defined but never used      @typescript-eslint/no-unused-vars
+  14:20  warning  'useTransition' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\clients\[id]\edit\ClientEditClient.tsx
+  27:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\clients\[id]\page.tsx
+  13:3   warning  'Edit' is defined but never used          @typescript-eslint/no-unused-vars
+  64:33  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  96:45  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\clients\new\ClientNewClient.tsx
+  24:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\documents\[id]\DocumentDetailClient.tsx
+   17:5   warning  'Download' is defined but never used      @typescript-eslint/no-unused-vars
+   52:11  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   55:16  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   56:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:58  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:56  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\documents\[id]\page.tsx
+  6:10  warning  'ChevronLeft' is defined but never used  @typescript-eslint/no-unused-vars
+  7:8   warning  'Link' is defined but never used         @typescript-eslint/no-unused-vars
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\documents\new\DocumentNewWizard.tsx
+  42:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\dashboard\leads\[id]\LeadDetailClient.tsx
+   8:16  warning  'LeadStatus' is defined but never used       @typescript-eslint/no-unused-vars
+  10:19  warning  'LayoutDashboard' is defined but never used  @typescript-eslint/no-unused-vars
+  40:14  warning  'error' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\Users\kapie\Documents\KPZsProductions\CRM\dev_crm\app\shared\[token]\page.tsx
+   4:10  warning  'DocumentType' is defined but never used  @typescript-eslint/no-unused-vars
+   5:10  warning  'toast' is defined but never used         @typescript-eslint/no-unused-vars
+  17:40  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:61  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:59  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ôťľ 63 problems (30 errors, 33 warnings)
 

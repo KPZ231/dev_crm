@@ -21,9 +21,9 @@ export function ClientNewClient({ workspaceId }: ClientNewClientProps) {
       const client = await createClient(workspaceId, data);
       toast.success("Klient został utworzony");
       router.push(`/dashboard/clients/${client.id}`);
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      toast.error(error.message || "Wystąpił błąd podczas tworzenia klienta.");
+      toast.error(error?.message || "Wystąpił błąd podczas tworzenia klienta.");
     } finally {
       setIsLoading(false);
     }

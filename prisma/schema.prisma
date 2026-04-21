@@ -444,8 +444,14 @@ model Document {
   name        String
   type        DocumentType
   status      DocumentStatus @default(DRAFT)
-  content     Json?          // Dynamic content of the document
+  content     String?        @db.Text
+  variables   Json?          // Key-value pairs for document variables
+  metadata    Json?          // City, date, custom footer, etc.
+  design      Json?          // Instance-specific design (inherited/overridden from template)
   fileUrl     String?        // Link to generated PDF if available
+  
+  shareToken  String?        @unique
+  shareLevel  String?        @default("VIEW") // VIEW or EDIT
   
   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   client      Client?         @relation(fields: [clientId], references: [id], onDelete: Cascade)

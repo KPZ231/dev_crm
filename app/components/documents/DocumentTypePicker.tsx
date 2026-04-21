@@ -6,7 +6,6 @@ import {
   FileSignature, 
   HelpCircle, 
   ShieldCheck, 
-  CreditCard, 
   LayoutList 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,7 +22,6 @@ export function DocumentTypePicker({ selected, onSelect, allowedTypes }: Documen
     { id: "CONTRACT", label: "Umowa", icon: FileSignature, desc: "Umowa B2B, umowa o dzieło lub zlecenie" },
     { id: "BRIEF", label: "Brief", icon: HelpCircle, desc: "Wymagania projektowe i założenia" },
     { id: "PROTOCOL", label: "Protokół", icon: ShieldCheck, desc: "Protokół odbioru lub przekazania" },
-    { id: "INVOICE", label: "Faktura", icon: CreditCard, desc: "Dokument księgowy (szablon)" },
     { id: "SUMMARY", label: "Podsumowanie", icon: LayoutList, desc: "Raport z prac lub podsumowanie etapu" },
   ];
 

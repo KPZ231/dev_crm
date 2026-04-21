@@ -14,9 +14,9 @@ export interface DocumentData {
  * Replaces variables in a template string with actual data.
  * Template format: {{variableName}}
  */
-export function fillTemplate(template: string, data: DocumentData): string {
+export function fillTemplate(template: any, data: DocumentData): string {
   if (!template) return "";
-  let result = template;
+  let result = typeof template === 'string' ? template : (template.html || JSON.stringify(template));
   
   // Add common dynamic variables if not present
   const enrichedData = {

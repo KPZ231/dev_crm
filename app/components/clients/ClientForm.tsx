@@ -21,10 +21,10 @@ export function ClientForm({ initialData, onSubmit, onCancel, isLoading }: Clien
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
-      status: ClientStatus.ACTIVE,
-      paymentStatus: PaymentStatus.UP_TO_DATE,
+      companyName: "",
+      contactPerson: "",
       ...initialData,
-    } as ClientFormValues,
+    } as any,
   });
 
   return (

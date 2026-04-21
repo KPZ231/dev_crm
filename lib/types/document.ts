@@ -1,8 +1,8 @@
 import { Document, DocumentTemplate, DocumentType, DocumentStatus, Client, Lead, Project } from "@prisma/client";
 
 export type DocumentWithRelations = Document & {
-  client?: Pick<Client, "id" | "companyName" | "email" | "address" | "nip"> | null;
-  lead?: Pick<Lead, "id" | "companyName" | "contactPerson" | "email"> | null;
+  client?: Pick<Client, "id" | "companyName" | "email" | "address" | "nip" | "phone"> | null;
+  lead?: Pick<Lead, "id" | "companyName" | "contactPerson" | "email" | "phone"> | null;
   project?: Pick<Project, "id" | "name"> | null;
   template?: Pick<DocumentTemplate, "id" | "name"> | null;
 };

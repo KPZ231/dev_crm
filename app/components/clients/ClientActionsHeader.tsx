@@ -26,8 +26,8 @@ export function ClientActionsHeader({ clientId, companyName, workspaceId, isProj
       await toggleProjectFinished(workspaceId, clientId, !isProjectFinished);
       toast.success(isProjectFinished ? "Przywrócono projekt do aktywnych" : "Oznaczono projekt jako ukończony");
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || "Błąd podczas zmiany statusu");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Błąd podczas zmiany statusu");
     } finally {
       setIsToggling(false);
     }

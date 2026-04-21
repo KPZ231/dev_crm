@@ -1,0 +1,57 @@
+PROJEKT: CRM / SYSTEM OPERACYJNY DLA SOFTWARE HOUSE
+=====================================================
+
+1. CEL I GRUPA DOCELOWA
+-----------------------
+- Produkt: CRM dla małych software house'ów i agencji.
+- Cel: Zarządzanie leadami, klientami, projektami, zadaniami, kosztami i dokumentami.
+- Grupa docelowa: Ownerzy agencji, Project Managerowie, Dev Leadzi.
+
+2. STOS TECHNOLOGICZNY (STACK)
+------------------------------
+- Framework: Next.js 14+ (App Router)
+- Język: TypeScript
+- Stylizacja: Tailwind CSS
+- Baza danych: PostgreSQL (via Prisma ORM)
+- Autentykacja: NextAuth.js v5
+- Walidacja: Zod
+
+3. ARCHITEKTURA I BEZPIECZEŃSTWO
+--------------------------------
+- Tenant Isolation: Wszystkie dane filtrowane po workspaceId z sesji.
+- RBAC (Role): owner > admin > PM > developer > sales.
+- Logika: Server Components + Server Actions.
+- Walidacja: Obowiązkowa po stronie serwera dla każdego inputu.
+- Audit Log: System gotowy pod logowanie wrażliwych operacji.
+
+4. DESIGN SYSTEM: "OBSIDIAN" (High-Contrast Dark)
+-----------------------------------------------
+- Estetyka: Precision in Darkness (Developer-grade UI).
+- Tło: #09090b (True near-black).
+- Akcent: #a78bfa (Violet).
+- Sukces: #34d399 (Emerald).
+- Typografia: Geist (modern, clean).
+- Separacja: Border 1px solid #27272a (zinc-based) zamiast cieni.
+
+5. GŁÓWNE MODUŁY SYSTEMU
+------------------------
+- Leady: Formularze, statusy, historia aktywności.
+- Klienci: Baza firm, karty klienta, timeline.
+- Projekty: Zarządzanie projektami, marża, zespoły.
+- Zadania: Tablica Kanban (backlog -> done), workflow devów.
+- Dokumenty: Oferty, umowy, briefy, protokoły (generowanie z szablonów).
+- Finanse: Revenue chart (MRR, revenue), podział kosztów (operacyjne vs projektowe).
+
+6. AKTUALNY STAN PRAC (CONTEXT)
+-------------------------------
+- Refaktoryzacja Modułu Dokumentów: Usuwanie przestarzałego typu "faktura" (zastąpione przez zewnętrzny system lub integrację), wdrażanie edytora WYSIWYG dla szablonów dokumentów, wsparcie dla podpisów.
+- Audyt i Logger: Implementacja systemu audit log dla zmian w rekordach.
+- Zintegrowana Wyszukiwarka: Global search w górnym barze.
+
+7. ZASADY PRACY AI (GUIDELINES)
+-------------------------------
+- Myślenie jak Senior Full-stack / Architect.
+- Priorytet dla bezpieczeństwa (server-side checks).
+- Modułowość i rozszerzalność kodu.
+- Brak placeholderów i "marketingowego vibe'u".
+- Dashboard to narzędzie operacyjne, nie strona wizytówka.

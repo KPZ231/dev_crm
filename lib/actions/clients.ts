@@ -7,7 +7,7 @@ import { ClientFilters, ClientWithDetails, ClientWithStats } from "@/lib/types/c
 import { requireWorkspacePermission } from "@/core/access/workspace";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-export async function getClients(workspaceId: string, filters?: ClientFilters): Promise<ClientWithStats[]> {
+export async function getClients(workspaceId: string, filters?: ClientFilters, limit: number = 50, skip: number = 0): Promise<ClientWithStats[]> {
   await requireWorkspacePermission(workspaceId, "read", "client");
 
   const { search, status, paymentStatus, sortBy = "createdAt", sortOrder = "desc" } = filters || {};
@@ -46,8 +46,10 @@ export async function getClients(workspaceId: string, filters?: ClientFilters): 
       }
     },
     orderBy: {
-      [sortBy]: sortOrder,
-    },
+        [sortBy]: sortOrder
+      },
+    take: limit,
+    skip: skip
   });
 
   // Calculate some derived stats for the list

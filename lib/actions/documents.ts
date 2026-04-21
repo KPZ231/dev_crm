@@ -8,7 +8,7 @@ import { fillTemplate } from "@/lib/document-generator";
 import { DocumentType, DocumentStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-export async function getDocuments(workspaceId: string, filters?: DocumentFilters): Promise<DocumentWithRelations[]> {
+export async function getDocuments(workspaceId: string, filters?: DocumentFilters, limit: number = 50, skip: number = 0): Promise<DocumentWithRelations[]> {
   await requireWorkspacePermission(workspaceId, "read", "document");
 
   const { type, status, clientId, leadId, projectId, search } = filters || {};
@@ -26,12 +26,14 @@ export async function getDocuments(workspaceId: string, filters?: DocumentFilter
       })
     },
     include: {
-      client: { select: { id: true, companyName: true, email: true, address: true, nip: true } },
-      lead: { select: { id: true, companyName: true, contactPerson: true, email: true } },
+      client: { select: { id: true, companyName: true, email: true, address: true, nip: true, phone: true } },
+      lead: { select: { id: true, companyName: true, contactPerson: true, email: true, phone: true } },
       project: { select: { id: true, name: true } },
       template: { select: { id: true, name: true } }
     },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: skip
   });
 }
 
@@ -41,8 +43,8 @@ export async function getDocumentById(workspaceId: string, id: string): Promise<
   return await prisma.document.findUnique({
     where: { id, workspaceId },
     include: {
-      client: { select: { id: true, companyName: true, email: true, address: true, nip: true } },
-      lead: { select: { id: true, companyName: true, contactPerson: true, email: true } },
+      client: { select: { id: true, companyName: true, email: true, address: true, nip: true, phone: true } },
+      lead: { select: { id: true, companyName: true, contactPerson: true, email: true, phone: true } },
       project: { select: { id: true, name: true } },
       template: { select: { id: true, name: true } }
     }
@@ -62,8 +64,11 @@ export async function createDocument(workspaceId: string, data: any) {
   const document = await prisma.document.create({
     data: {
       ...validated,
-      workspaceId
-    }
+      workspaceId,
+      variables: validated.variables || {},
+      metadata: validated.metadata || {},
+      design: validated.design || {}
+    } as any
   });
 
   revalidatePath("/dashboard/documents");
@@ -103,20 +108,87 @@ export async function updateDocumentStatus(workspaceId: string, id: string, stat
   return document;
 }
 
+export async function createShareLink(workspaceId: string, id: string, level: "VIEW" | "EDIT") {
+  await requireWorkspacePermission(workspaceId, "update", "document");
+
+  const shareToken = crypto.randomUUID();
+  
+  const document = await prisma.document.update({
+    where: { id, workspaceId },
+    data: { 
+      shareToken,
+      shareLevel: level
+    }
+  });
+
+  revalidatePath(`/dashboard/documents/${id}`);
+  return { shareToken, shareLevel: level };
+}
+
+export async function getDocumentByShareToken(token: string) {
+  const document = await prisma.document.findUnique({
+    where: { shareToken: token },
+    include: {
+      client: { select: { id: true, companyName: true, email: true, address: true, nip: true, phone: true } },
+      lead: { select: { id: true, companyName: true, contactPerson: true, email: true, phone: true } },
+      project: { select: { id: true, name: true } },
+    }
+  });
+
+  return document;
+}
+
+export async function updateSharedDocumentByToken(token: string, data: any) {
+  const document = await prisma.document.findUnique({
+    where: { shareToken: token }
+  });
+
+  if (!document) {
+      throw new Error("Document not found");
+  }
+
+  if (document.shareLevel !== "EDIT") {
+      throw new Error("Unauthorized to edit this document.");
+  }
+
+  const validated = documentSchema.partial().parse(data);
+
+  const updateData: any = { ...validated };
+  if (validated.variables) updateData.variables = validated.variables;
+  if (validated.metadata) updateData.metadata = validated.metadata;
+  if (validated.design) updateData.design = validated.design;
+
+  const updatedDoc = await prisma.document.update({
+    where: { id: document.id },
+    data: updateData
+  });
+
+  revalidatePath(`/shared/${token}`);
+  return updatedDoc;
+}
+
+
 export async function updateDocument(workspaceId: string, id: string, data: any) {
   await requireWorkspacePermission(workspaceId, "update", "document");
   
   const validated = documentSchema.partial().parse(data);
 
+  // Prisma needs JSON fields to be compatible with its types
+  const updateData: any = { ...validated };
+  if (validated.variables) updateData.variables = validated.variables;
+  if (validated.metadata) updateData.metadata = validated.metadata;
+  if (validated.design) updateData.design = validated.design;
+
   const document = await prisma.document.update({
     where: { id, workspaceId },
-    data: validated
+    data: updateData
   });
 
-  revalidatePath(`/documents/${id}`);
+  revalidatePath(`/dashboard/documents/${id}`);
   revalidatePath("/dashboard/documents");
   return document;
 }
+
 
 // Templates Actions
 export async function getTemplates(workspaceId: string): Promise<DocumentTemplateWithCount[]> {
@@ -179,13 +251,4 @@ export async function deleteTemplate(workspaceId: string, id: string) {
 
   revalidatePath("/dashboard/documents/templates");
   return { success: true };
-}
-
-export async function exportDocumentToPdf(workspaceId: string, id: string) {
-    // This is a stub for server-side PDF generation
-    // In a real app, use puppeteer or a service to generate PDF from HTML/Content
-    await requireWorkspacePermission(workspaceId, "read", "document");
-    
-    // Logic here would generate the PDF and return a URL or signed S3 link
-    return { url: `/api/documents/${id}/pdf` }; 
 }
