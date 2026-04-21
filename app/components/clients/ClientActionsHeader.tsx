@@ -36,7 +36,7 @@ export function ClientActionsHeader({ clientId, companyName, workspaceId, isProj
   return (
     <div className="flex flex-wrap items-center gap-3">
       {/* Edit Button */}
-      <Link 
+      <Link
         href={`/dashboard/clients/${clientId}/edit`}
         className="p-2.5 bg-[#141416] border border-[#27272a] rounded-lg text-[#a1a1aa] hover:text-[#fafafa] hover:border-[#a78bfa]/40 transition-all shadow-sm"
         title="Edytuj dane klienta"
@@ -45,7 +45,7 @@ export function ClientActionsHeader({ clientId, companyName, workspaceId, isProj
       </Link>
 
       {/* Delete Button */}
-      <button 
+      <button
         onClick={() => setIsDeleteModalOpen(true)}
         className="p-2.5 bg-[#141416] border border-[#27272a] rounded-lg text-red-500/70 hover:text-red-500 hover:border-red-500/40 transition-all shadow-sm"
         title="Usuń klienta"
@@ -59,11 +59,10 @@ export function ClientActionsHeader({ clientId, companyName, workspaceId, isProj
       <button
         onClick={handleToggleFinished}
         disabled={isToggling}
-        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all shadow-lg ${
-          isProjectFinished 
-          ? "bg-emerald-500 text-[#0c0c0f] hover:bg-emerald-600" 
+        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all shadow-lg ${isProjectFinished
+          ? "bg-emerald-500 text-[#0c0c0f] hover:bg-emerald-600"
           : "bg-[#141416] border border-[#27272a] text-[#a1a1aa] hover:text-[#fafafa] hover:border-[#34d399]/40"
-        }`}
+          }`}
       >
         {isToggling ? (
           <Loader2 className="w-4 h-4 animate-spin" />
@@ -76,7 +75,7 @@ export function ClientActionsHeader({ clientId, companyName, workspaceId, isProj
       </button>
 
       {/* Add Project Button */}
-      <Link 
+      <Link
         href={`/dashboard/projects/new?clientId=${clientId}`}
         className="flex items-center gap-2 bg-[#a78bfa] hover:bg-[#8b5cf6] text-[#09090b] font-bold px-6 py-2.5 rounded-lg transition-all shadow-lg"
       >
@@ -84,7 +83,7 @@ export function ClientActionsHeader({ clientId, companyName, workspaceId, isProj
         Utwórz Projekt
       </Link>
 
-      <DeleteClientModal 
+      <DeleteClientModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         clientId={clientId}

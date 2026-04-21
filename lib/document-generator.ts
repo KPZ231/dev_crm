@@ -15,15 +15,21 @@ export interface DocumentData {
  * Template format: {{variableName}}
  */
 export function fillTemplate(template: string, data: DocumentData): string {
+  if (!template) return "";
   let result = template;
   
-  for (const [key, value] of Object.entries(data)) {
-    const regex = new RegExp(`{{${key}}}`, "g");
-    result = result.replace(regex, value?.toString() || "");
-  }
+  // Add common dynamic variables if not present
+  const enrichedData = {
+    date: new Date().toLocaleDateString('pl-PL'),
+    ...data
+  };
   
-  // Clean up any remaining tags
-  result = result.replace(/{{[a-zA-Z0-9_]+}}/g, "");
+  // Replace variables from data
+  for (const [key, value] of Object.entries(enrichedData)) {
+    const regex = new RegExp(`{{${key}}}`, "g");
+    const replacement = value !== undefined && value !== null ? value.toString() : "";
+    result = result.replace(regex, replacement);
+  }
   
   return result;
 }

@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { fillTemplate } from "@/lib/document-generator";
+import { parseMarkdown } from "@/lib/markdown";
 
 const DEFAULT_DESIGN = {
   primaryColor: "#a78bfa",
@@ -41,6 +43,7 @@ export interface WYSIWYGEditorProps {
   backUrl: string;
   readOnlyType?: boolean;
   headerActions?: React.ReactNode;
+  variableData?: any;
 }
 
 export function WYSIWYGEditor({ 
@@ -52,7 +55,8 @@ export function WYSIWYGEditor({
     isPending,
     backUrl,
     readOnlyType = false,
-    headerActions
+    headerActions,
+    variableData = {}
 }: WYSIWYGEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
@@ -61,6 +65,11 @@ export function WYSIWYGEditor({
     type: initialType,
     content: initialContent,
   });
+
+  // Effect to sync content if initialContent changes (e.g. from template generation)
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, content: initialContent }));
+  }, [initialContent]);
 
   const [design, setDesign] = useState<EditorDesign>(
     initialDesign ? (typeof initialDesign === 'string' ? JSON.parse(initialDesign) : initialDesign) : DEFAULT_DESIGN
@@ -348,7 +357,9 @@ export function WYSIWYGEditor({
                 {/* Body parsing */}
                 <div 
                     className="prose prose-sm max-w-none prose-headings:font-bold prose-headings:text-black mb-16 break-words"
-                    dangerouslySetInnerHTML={{ __html: formData.content }} 
+                    dangerouslySetInnerHTML={{ 
+                        __html: parseMarkdown(fillTemplate(formData.content, variableData))
+                    }} 
                 />
 
                 {/* Footer / Signature */}
