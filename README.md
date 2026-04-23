@@ -74,20 +74,6 @@ Auxilium is a great fit for:
 - Organizing recurring business workflows
 - Improving collaboration across departments
 
-## Suggested Tech Stack
-
-If this project is being built as a modern SaaS/web app, a strong stack could be:
-
-| Layer | Suggested Technology |
-|-------|----------------------|
-| Frontend | Next.js, React, TypeScript |
-| UI | Tailwind CSS, shadcn/ui |
-| Backend | Node.js, NestJS, Next API Routes |
-| Database | PostgreSQL, Prisma |
-| Auth | Clerk, Auth.js, Supabase Auth |
-| Realtime | Pusher, Ably, Supabase |
-| Deployment | Vercel, Docker, Railway |
-
 ## Project Structure
 
 ```bash
